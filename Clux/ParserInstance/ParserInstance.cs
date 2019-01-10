@@ -137,17 +137,17 @@ namespace Clux
                     }
                     else if (this.ByShortOption.GetShortOption(first, out var shortOption))
                     {
-                        current = Apply(current, shortOption, target);
+                        current = ApplyOption(current, shortOption, target);
                     }
                     else if (this.ByLongOption.GetLongOption(first, out var longOption))
                     {
-                        current = Apply(current, longOption, target);
+                        current = ApplyOption(current, longOption, target);
                     }
                     else
                     {
                         var positionalOption = this.ByPosition.Get(position++, this.All);
 
-                        current = Apply(current, positionalOption, target);
+                        current = ApplyOption(current, positionalOption, target);
                     }
                 }
 
@@ -188,104 +188,123 @@ namespace Clux
             }
         }
 
-        List<string> Apply(List<string> args, TargetProperty<T> property, T target)
+        List<string> ApplyOption(List<string> args, TargetProperty<T> property, T target)
         {
             if (property.TargetType.IsArray)
             {
-                if (!property.Position.HasValue)
-                {
-                    args.RemoveAt(0);
-                }
-
-                var elementType = property.TargetType.GetElementType();
-
-                var remainingPositionals = this.ByPosition.Remaining(property.Position);
-                var take = args.Count() - remainingPositionals;
-
-                var used = new List<object>();
-                foreach (var arg in args.Take(take))
-                {
-                    if (this.ByShortOption.IsShortOption(arg) || this.ByLongOption.IsLongOption(arg))
-                    {
-                        break;
-                    }
-
-                    var parsed = new ParserArg<T>(property.LongOption, elementType, arg).ParseArg();
-
-                    used.Add(parsed);
-                }
-
-                if (used.Any())
-                {
-                    if (used.Count() < args.Count())
-                    {
-                        args.RemoveRange(0, used.Count());
-                    }
-                    else
-                    {
-                        args.Clear();
-                    }
-
-                    var arrayType = elementType.MakeArrayType();
-
-                    int previousLength = 0;
-
-                    object previous = null;
-                    if (property.Touched)
-                    {
-                        previous = property.GetValue(target);
-                        var arrayLength = arrayType.GetProperty("Length");
-                        previousLength = (int)arrayLength.GetValue(previous);
-                    }
-
-                    var array = arrayType
-                        .GetConstructor(new[] { typeof(int) })
-                         .Invoke(new object[] { used.Count() + previousLength });
-
-                    var setItem = arrayType.GetMethod("Set");
-                    var getItem = arrayType.GetMethod("Get");
-
-                    var cursor = 0;
-                    for (;cursor < previousLength;)
-                    {
-                        var previousElement = getItem.Invoke(previous, new object[]{ cursor });
-                        setItem.Invoke(array, new []{ cursor++, previousElement });
-                    }
-                    foreach (var element in used)
-                    {
-                        setItem.Invoke(array, new []{ cursor++, element });
-                    }
-
-                    property.SetValue(target, array);
-                }
+                return ApplyArrayOption(args, property, target);
             }
             else if (typeof(bool).IsAssignableFrom(property.TargetType) || typeof(bool?).IsAssignableFrom(property.TargetType))
             {
-                if (!property.Position.HasValue)
-                {
-                    args.RemoveAt(0);
-                }
-
-                if (property.Touched)
-                {
-                    throw new DuplicateOption(property.LongOption);
-                }
-                property.SetValue(target, true);
+                return ApplyBooleanOption(args, property, target);
             }
             else
             {
-                if (property.Touched)
-                {
-                    throw new DuplicateOption(property.LongOption);
-                }
+                return ApplyPositionalOption(args, property, target);
+            }
+        }
 
-                string sArg;
-                args = GetPositionalValue(property.Name, property.Position.HasValue, args, out sArg);
-
-                var arg = new ParserArg<T>(property.LongOption, property.TargetType, sArg).ParseArg();
-                property.SetValue(target, arg);
+        private List<string> ApplyPositionalOption(List<string> args, TargetProperty<T> property, T target)
+        {
+            if (property.Touched)
+            {
+                throw new DuplicateOption(property.LongOption);
             }
 
+            string sArg;
+            args = GetPositionalValue(property.Name, property.Position.HasValue, args, out sArg);
+
+            var arg = new ParserArg<T>(property.LongOption, property.TargetType, sArg).ParseArg();
+            property.SetValue(target, arg);
+            
+            return args;
+        }
+
+        private static List<string> ApplyBooleanOption(List<string> args, TargetProperty<T> property, T target)
+        {
+            if (!property.Position.HasValue)
+            {
+                args.RemoveAt(0);
+            }
+
+            if (property.Touched)
+            {
+                throw new DuplicateOption(property.LongOption);
+            }
+            property.SetValue(target, true);
+            
+            return args;
+        }
+
+        private List<string> ApplyArrayOption(List<string> args, TargetProperty<T> property, T target)
+        {
+            if (!property.Position.HasValue)
+            {
+                args.RemoveAt(0);
+            }
+
+            var elementType = property.TargetType.GetElementType();
+
+            var remainingPositionals = this.ByPosition.Remaining(property.Position);
+            var take = args.Count() - remainingPositionals;
+
+            var used = new List<object>();
+            foreach (var arg in args.Take(take))
+            {
+                if (this.ByShortOption.IsShortOption(arg) || this.ByLongOption.IsLongOption(arg))
+                {
+                    break;
+                }
+
+                var parsed = new ParserArg<T>(property.LongOption, elementType, arg).ParseArg();
+
+                used.Add(parsed);
+            }
+
+            if (used.Any())
+            {
+                if (used.Count() < args.Count())
+                {
+                    args.RemoveRange(0, used.Count());
+                }
+                else
+                {
+                    args.Clear();
+                }
+
+                var arrayType = elementType.MakeArrayType();
+
+                int previousLength = 0;
+
+                object previous = null;
+                if (property.Touched)
+                {
+                    previous = property.GetValue(target);
+                    var arrayLength = arrayType.GetProperty("Length");
+                    previousLength = (int)arrayLength.GetValue(previous);
+                }
+
+                var array = arrayType
+                    .GetConstructor(new[] { typeof(int) })
+                     .Invoke(new object[] { used.Count() + previousLength });
+
+                var setItem = arrayType.GetMethod("Set");
+                var getItem = arrayType.GetMethod("Get");
+
+                var cursor = 0;
+                for (; cursor < previousLength;)
+                {
+                    var previousElement = getItem.Invoke(previous, new object[] { cursor });
+                    setItem.Invoke(array, new[] { cursor++, previousElement });
+                }
+                foreach (var element in used)
+                {
+                    setItem.Invoke(array, new[] { cursor++, element });
+                }
+
+                property.SetValue(target, array);
+            }
+            
             return args;
         }
 

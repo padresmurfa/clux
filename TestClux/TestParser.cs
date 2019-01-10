@@ -4,6 +4,7 @@ using System.Linq;
 using Clux;
 
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace TestClux
 {
@@ -18,91 +19,63 @@ namespace TestClux
             blue = 0x0000FF
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         class Clopts
         {
             [Positional]
-            [Usage("")]
             public string Pronoun { get; set; }
 
             [Positional]
-            [Usage("")]
             public string Noun { get; set; }
 
             [Positional]
-            [Usage("")]
             public string[] Files { get; set; }
 
             [Positional]
-            [Usage("")]
             public string LastFile { get; set; }
 
-            [Usage("")]
             public bool? Indicator { get; set; }
 
-            [Usage("")]
             public bool? Node;
 
             [Abbreviation('l')]
-            [Usage("")]
             public string Location { get; set; }
 
             [Abbreviation('L')]
-            [Usage("")]
             public string Lies;
 
-            [Usage("")]
             public bool? Oompfh { get; set; }
 
-            [Usage("")]
             public string The;
 
-            [Usage("")]
             public byte? KByte { get; set; }
-            [Usage("")]
             public ushort? KUShort { get; set; }
-            [Usage("")]
             public uint? KUInt { get; set; }
-            [Usage("")]
             public ulong? KULong { get; set; }
 
-            [Usage("")]
             public sbyte? KSByte { get; set; }
-            [Usage("")]
             public short? KShort { get; set; }
-            [Usage("")]
             public int? KInt { get; set; }
-            [Usage("")]
             public long? KLong { get; set; }
 
-            [Usage("")]
             public decimal? KDecimal { get; set; }
-            [Usage("")]
             public float? KFloat { get; set; }
-            [Usage("")]
             public double? KDouble { get; set; }
 
-            [Usage("")]
             public KEnumType? KEnum;
 
-            [Usage("")]
             public char? KChar;
 
-            [Usage("")]
             public bool? KTheRainInSpainLiesMainlyOnThePlains;
 
-            [Usage("")]
             public int? KNullableInt { get; set; }
 
-            [Usage("")]
             public int[] KInts { get; set; }
 
-            [Usage("")]
             public DateTime? KDateTime { get; set;}
 
-            [Usage("")]
             public string KString;
 
-            [Usage("")]
             public string[] KMultiple { get; set; }
         }
 
@@ -143,7 +116,7 @@ namespace TestClux
         {
             var clopts = parser.Parse(new[] { "-o" });
 
-            Assert.Equal(true, clopts.Oompfh);
+            Assert.True(clopts.Oompfh);
         }
 
         [Fact]
@@ -183,7 +156,7 @@ namespace TestClux
 
             Assert.Equal("the", clopts.Pronoun);
             Assert.Equal("rain", clopts.Noun);
-            Assert.Equal(1, clopts.Files.Length);
+            Assert.Single(clopts.Files);
             Assert.Equal("in", clopts.Files[0]);
             Assert.Equal("spain", clopts.LastFile);
 
@@ -696,10 +669,8 @@ namespace TestClux
         class ConstStruct
         {
             [Constant(1)]
-            [Usage("")]
             public int? ConstantOrDie;
             
-            [Usage("")]
             public bool? Detach;
         }
             
@@ -805,6 +776,90 @@ namespace TestClux
                 }).Else((e) => {
                     Assert.True(false);
                 });
+        }
+        
+        [StructLayout(LayoutKind.Sequential)]
+        public class TestOrder1
+        {
+            [Positional]
+            public string Arg1;
+            
+            [Positional]
+            public string Arg2;
+            
+            public string Arg3;
+            
+            [Positional]
+            public string Arg4;
+        }
+        
+        [StructLayout(LayoutKind.Sequential)]
+        public class TestOrder2
+        {
+            public string Arg3;
+            
+            [Positional]
+            public string Arg1;
+            
+            [Positional]
+            public string Arg2;
+            
+            [Positional]
+            public string Arg4;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public class TestOrder3
+        {
+            [Positional]
+            public string Arg1;
+            
+            [Positional]
+            public string Arg3;
+            
+            [Positional]
+            public string Arg2;
+            
+            [Positional]
+            public string Arg4;
+        }
+        
+        // TODO: consider enforcing a description, and having it derive from this
+        //       so the creator does not have to do this manually
+        [StructLayout(LayoutKind.Sequential)]
+        public class TestOrder4
+        {
+            public string Arg4;
+            
+            public string Arg3;
+            
+            public string Arg2;
+            
+            public string Arg1;
+        }
+
+        [Fact]
+        public void DescribesArgsInCorrectOrderInHelp()
+        {
+            var parser1 = Parser<TestOrder1>.Create();
+            
+            var help = parser1.GetHelpMessage("order");
+            Assert.Equal("usage: order [-a <str>] [arg1] [arg2] [arg4]", help.Split("\n").First());
+            
+            var parser2 = Parser<TestOrder2>.Create();
+            
+            help = parser2.GetHelpMessage("order");
+            Assert.Equal("usage: order [-a <str>] [arg1] [arg2] [arg4]", help.Split("\n").First());
+            
+            var parser3 = Parser<TestOrder3>.Create();
+            
+            help = parser3.GetHelpMessage("order");
+            Assert.Equal("usage: order [arg1] [arg3] [arg2] [arg4]", help.Split("\n").First());
+            
+            var parser4 = Parser<TestOrder4>.Create();
+            
+            help = parser4.GetHelpMessage("order");
+            Assert.Equal("usage: order [--arg4 <str>] [--arg3 <str>] [--arg2 <str>] [--arg1 <str>]", help.Split("\n").First());
         }
     }
 }

@@ -3,25 +3,36 @@ using System.Linq;
 using System.Reflection;
 using System;
 using System.Collections;
+using System.Runtime.InteropServices;
 
 namespace Clux
 {
     public class TargetProperty<T> where T : new()
     {
-        public static string ToSnakeCase(string str)
+        static string KebabChar(char c, int index)
         {
-            return string.Concat(str.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLowerInvariant();
+            if (index > 0)
+            {
+                var isUpper = char.IsUpper(c);
+                if (isUpper)
+                {
+                    c = char.ToLowerInvariant(c);
+                    return $"-{c}";
+                }
+            }
+            return char.ToLowerInvariant(c).ToString();
         }
-
+        
         public static string ToKebabCase(string str)
         {
-            return string.Concat(str.Select((x, i) => i > 0 && char.IsUpper(x) ? "-" + x.ToString() : x.ToString())).ToLowerInvariant();
+            var kebab = str.Select(KebabChar);
+            return string.Concat(kebab);
         }
 
         public string Name { get; private set; }
         public string LongOption { get; private set; }
         public char? ShortOption { get; set; }
-        public int Order { get; private set; }
+        public UInt64 Order { get; private set; }
         public int? Position { get; set; }
         public System.Type TargetType { get; private set; }
         public bool Touched { get; set; }
@@ -33,15 +44,21 @@ namespace Clux
 
         public bool IsShortOptionExplicit { get; set; }
 
-        TargetProperty(string name, ConstantAttribute constant, UsageAttribute usage, RequiredAttribute required, AbbreviationAttribute abbreviation, PositionalAttribute positional, System.Type memberType)
+        public TargetProperty(FieldInfo field)
+            : this(field.Name, (ConstantAttribute)field.GetCustomAttribute(typeof(ConstantAttribute)), (UsageAttribute)field.GetCustomAttribute(typeof(UsageAttribute)), (RequiredAttribute)field.GetCustomAttribute(typeof(RequiredAttribute)), (AbbreviationAttribute)field.GetCustomAttribute(typeof(AbbreviationAttribute)), (PositionalAttribute)field.GetCustomAttribute(typeof(PositionalAttribute)), field.FieldType, field.DeclaringType)
+        {
+        }
+
+        public TargetProperty(PropertyInfo property)
+            : this(property.Name, (ConstantAttribute)property.GetCustomAttribute(typeof(ConstantAttribute)), (UsageAttribute)property.GetCustomAttribute(typeof(UsageAttribute)), (RequiredAttribute)property.GetCustomAttribute(typeof(RequiredAttribute)), (AbbreviationAttribute)property.GetCustomAttribute(typeof(AbbreviationAttribute)), (PositionalAttribute)property.GetCustomAttribute(typeof(PositionalAttribute)), property.PropertyType, property.DeclaringType)
+        {
+        }
+
+        TargetProperty(string name, ConstantAttribute constant, UsageAttribute usage, RequiredAttribute required, AbbreviationAttribute abbreviation, PositionalAttribute positional, System.Type memberType, System.Type declaringType)
         {
             if (name == null)
             {
                 throw new ArgumentNullException(nameof(name));
-            }
-            if (usage == null)
-            {
-                throw new ArgumentNullException(nameof(usage));
             }
             if (memberType == null)
             {
@@ -49,15 +66,80 @@ namespace Clux
             }
 
             this.Name = name;
-            
-            this.Usage = usage.Usage ?? string.Empty;
+
+            this.Usage = usage?.Usage ?? string.Empty;
 
             this.Position = positional?.Order;
 
+            SetLongOption();
+
+            SetShortOption(abbreviation);
+
+            this.Constant = constant?.Constant;
+
+            SetOrder(memberType, declaringType, usage, required, abbreviation, positional);
+
+            SetRequired(required, memberType);
+
+            this.TargetType = memberType;
+        }
+
+        private void SetRequired(RequiredAttribute required, Type memberType)
+        {
+            var isExplicitlyRequired = required != null;
+            if (isExplicitlyRequired)
+            {
+                this.Required = true;
+            }
+            else
+            {
+                var isNullableType = (!memberType.IsValueType) || (null != Nullable.GetUnderlyingType(memberType));
+                if (!isNullableType)
+                {
+                    this.Required = true;
+                }
+                else
+                {
+                    this.Required = false;
+                }
+            }
+        }
+
+        private void SetOrder(Type memberType, Type declaringType, params OrderedAttribute[] attributes)
+        {
+            if (attributes.Any(x => x != null))
+            {
+                var order = unchecked((UInt32)attributes.Max(x => x?.Order ?? 0) + 1);
+                this.Order = ((UInt64)order) << 32;
+            }
+
+            var structLayout = (StructLayoutAttribute)declaringType.GetCustomAttribute(typeof(StructLayoutAttribute));
+            if (structLayout?.Value == LayoutKind.Sequential)
+            {
+                this.Order += unchecked((UInt32)memberType.MetadataToken);
+            }
+            else if (declaringType.IsValueType && !declaringType.IsEnum)
+            {
+                // it's a struct, and structs use sequential layout by default
+                if (structLayout == null || structLayout.Value == LayoutKind.Auto)
+                {
+                    this.Order += unchecked((UInt32)memberType.MetadataToken);
+                }
+            }
+        }
+
+        private void SetLongOption()
+        {
             if (!this.Position.HasValue)
             {
                 this.LongOption = this.KebabName;
+            }
+        }
 
+        private void SetShortOption(AbbreviationAttribute abbreviation)
+        {
+            if (!this.Position.HasValue)
+            {
                 if (abbreviation?.Abbreviation != null)
                 {
                     this.IsShortOptionExplicit = true;
@@ -68,28 +150,6 @@ namespace Clux
                     this.ShortOption = this.LongOption.First();
                 }
             }
-            
-            this.Constant = constant?.Constant;
-
-            this.Order = (new OrderedAttribute[]{ usage, required, abbreviation, positional }).Max(x => x?.Order ?? 0) + 1 /* roughly correct */;
-
-            var isExplicitlyRequired = required != null;
-
-            var isNullableType = (!memberType.IsValueType) || (null != Nullable.GetUnderlyingType(memberType));
-
-            this.Required = isExplicitlyRequired || !isNullableType;
-
-            this.TargetType = memberType;
-        }
-
-        public TargetProperty(FieldInfo field)
-            : this(field.Name, (ConstantAttribute)field.GetCustomAttribute(typeof(ConstantAttribute)), (UsageAttribute)field.GetCustomAttribute(typeof(UsageAttribute)), (RequiredAttribute)field.GetCustomAttribute(typeof(RequiredAttribute)), (AbbreviationAttribute)field.GetCustomAttribute(typeof(AbbreviationAttribute)), (PositionalAttribute)field.GetCustomAttribute(typeof(PositionalAttribute)), field.FieldType)
-        {
-        }
-
-        public TargetProperty(PropertyInfo property)
-            : this(property.Name, (ConstantAttribute)property.GetCustomAttribute(typeof(ConstantAttribute)), (UsageAttribute)property.GetCustomAttribute(typeof(UsageAttribute)), (RequiredAttribute)property.GetCustomAttribute(typeof(RequiredAttribute)), (AbbreviationAttribute)property.GetCustomAttribute(typeof(AbbreviationAttribute)), (PositionalAttribute)property.GetCustomAttribute(typeof(PositionalAttribute)), property.PropertyType)
-        {
         }
 
         public void SetValue(T instance, object value)
@@ -107,17 +167,20 @@ namespace Clux
             {
                 pi.SetValue(instance, value);
                 Touched = true;
-                return;
             }
-
-            var fi = typeof(T).GetField(Name);
-            if (fi != null)
+            else
             {
-                fi.SetValue(instance, value);
-                Touched = true;
-                return;
+                var fi = typeof(T).GetField(Name);
+                if (fi != null)
+                {
+                    fi.SetValue(instance, value);
+                    Touched = true;
+                }
+                else
+                {
+                    throw new NotImplementedException("The target is neither a property or a field.  This was unexpected.");
+                }
             }
-            throw new NotImplementedException("The target is neither a property or a field.  This was unexpected.");
         }
 
         public object GetValue(T instance)
@@ -127,13 +190,18 @@ namespace Clux
             {
                 return pi.GetValue(instance);
             }
-
-            var fi = typeof(T).GetField(Name);
-            if (fi != null)
+            else
             {
-                return fi.GetValue(instance);
+                var fi = typeof(T).GetField(Name);
+                if (fi != null)
+                {
+                    return fi.GetValue(instance);
+                }
+                else
+                {
+                    throw new NotImplementedException("The target is neither a property or a field.  This was unexpected.");
+                }
             }
-            throw new NotImplementedException("The target is neither a property or a field.  This was unexpected.");
         }
 
         public static IEnumerable<TargetProperty<T>> TargetPropertiesAndFields

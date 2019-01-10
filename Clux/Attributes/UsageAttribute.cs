@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Clux
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
     public sealed class UsageAttribute : OrderedAttribute
     {
         private readonly string usage;

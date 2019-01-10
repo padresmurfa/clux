@@ -6,8 +6,15 @@
 
   <ItemGroup>
     <Compile Remove="RemainderAttribute.cs" />
+    <Compile Remove="CommandLineArgsAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Attributes\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="ParserInstance\" />
   </ItemGroup>
 </Project>

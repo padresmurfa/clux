@@ -136,15 +136,38 @@ namespace Clux
             return string.Join("\n", submessages);
         }        
 
+        static readonly string[] _sortableIgnore = new [] { " ", "[", "-", "<" };
         static string Sortable(string i)
         {
             var s = i.IndexOf(':');
             
             var retval = i.Substring(0, s - 1);
             
-            return retval.Replace(" ","").Replace("[","").Replace("-","").Replace("<","");
+            foreach (var replace in _sortableIgnore)
+            {
+                retval = retval.Replace(replace, "");
+            }
+            return retval;
         }
-
+        
+        static Type[] describeArgTypes = new []{
+            typeof(bool),
+            typeof(string), typeof(char),
+            typeof(DateTime),
+            typeof(sbyte), typeof(short), typeof(int), typeof(long),
+            typeof(byte), typeof(ushort), typeof(uint), typeof(ulong),
+            typeof(double), typeof(float), typeof(decimal)
+        };
+        
+        static string[] describeArgs = new []{
+            "",
+            " <str>", " <char>",
+            " <datetime>",
+            " <int8>", " <int16>", " <n>", " <int64>",
+            " <uint8>", " <uint16>", " <uint>", " <uint64>",
+            " <double>", " <float>", " <decimal>"
+        };
+        
         static string DescribeArgUsage(string longOption, Type targetType)
         {
             var underlyingNull = Nullable.GetUnderlyingType(targetType);
@@ -181,70 +204,14 @@ namespace Clux
             }
             else
             {
-                if (typeof(bool).IsAssignableFrom(targetType))
+                for (var i=0; i<describeArgTypes.Length; ++i)
                 {
-                    return "";
+                    if (describeArgTypes[i].IsAssignableFrom(targetType))
+                    {
+                        return describeArgs[i];
+                    }
                 }
-                else if (typeof(string).IsAssignableFrom(targetType))
-                {
-                    return " <str>";
-                }
-                else if (typeof(char).IsAssignableFrom(targetType))
-                {
-                    return " <char>";
-                }
-                else if (typeof(DateTime).IsAssignableFrom(targetType))
-                {
-                    return " <datetime>";
-                }
-                else if (typeof(sbyte).IsAssignableFrom(targetType))
-                {
-                    return " <int8>";
-                }
-                else if (typeof(short).IsAssignableFrom(targetType))
-                {
-                    return " <int16>";
-                }
-                else if (typeof(int).IsAssignableFrom(targetType))
-                {
-                    return " <n>";
-                }
-                else if (typeof(long).IsAssignableFrom(targetType))
-                {
-                    return " <int64>";
-                }
-                else if (typeof(byte).IsAssignableFrom(targetType))
-                {
-                    return " <uint8>";
-                }
-                else if (typeof(ushort).IsAssignableFrom(targetType))
-                {
-                    return " <uint16>";
-                }
-                else if (typeof(uint).IsAssignableFrom(targetType))
-                {
-                    return " <uint>";
-                }
-                else if (typeof(ulong).IsAssignableFrom(targetType))
-                {
-                    return " <uint64>";
-                }
-                else if (typeof(double).IsAssignableFrom(targetType))
-                {
-                    return " <double>";
-                }
-                else if (typeof(float).IsAssignableFrom(targetType))
-                {
-                    return " <float>";
-                }
-                else if (typeof(decimal).IsAssignableFrom(targetType))
-                {
-                    return " <decimal>";
-                }
-                else
-                {
-                    throw new NotSupportedException("type " + targetType.FullName + " used by " + longOption + " has an unsupported base type");
-                }
+                throw new NotSupportedException("type " + targetType.FullName + " used by " + longOption + " has an unsupported base type");
             }
         }
     }
