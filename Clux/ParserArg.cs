@@ -172,7 +172,14 @@ namespace Clux
         {
             try
             {
-                return S2N.s2n<N>(arg);
+                try
+                {
+                    return S2N.s2n<N>(arg);
+                }
+                catch (TargetInvocationException ex)
+                {
+                    throw ex.InnerException;
+                }
             }
             catch (FormatException)
             {
@@ -181,6 +188,10 @@ namespace Clux
             catch (OverflowException)
             {
                 throw new InvalidOptionValue(longOption);
+            }
+            catch (Exception)
+            {
+               throw new InvalidOptionValue(longOption);
             }
         }
     }

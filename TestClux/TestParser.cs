@@ -666,7 +666,53 @@ namespace TestClux
             }
         }
         
-        class ConstStruct
+        public class Remainder
+        {
+            [Positional]
+            [Required]
+            [Usage("The command to perform, e.g. run, exec, kill, stop, ...")]
+            public string Verb { get; set; }
+        }
+        
+        [Fact]
+        public void SupportsReturningRemainder()
+        {
+            Parser<Remainder>.Parse(out var remainder, new string[] { "verb", "remainder", "jar" } );
+            Assert.Equal(2, remainder.Length);
+            
+            Assert.Equal("remainder", remainder[0]);
+            Assert.Equal("jar", remainder[1]);
+        }
+
+        public class RemainderError
+        {
+            [Positional]
+            [Required]
+            [Usage("The command to perform, e.g. run, exec, kill, stop, ...")]
+            public string Verb { get; set; }
+            
+            [Positional]
+            public int i;
+        }
+
+        [Fact]
+        public void SupportsReturningRemainderWhenError()
+        {
+            string[] remainder = null;
+            try
+            {
+                Parser<RemainderError>.Parse(out remainder, new string[] { "verb", "remainder", "jar" } );
+            }
+            catch (Exception ex)
+            {
+                Assert.Equal(2, remainder.Length);
+                
+                Assert.Equal("remainder", remainder[0]);
+                Assert.Equal("jar", remainder[1]);
+            }
+        }
+        
+        class OptionalConstStruct
         {
             [Constant(1)]
             public int? ConstantOrDie;
@@ -675,12 +721,45 @@ namespace TestClux
         }
             
         [Fact]
-        public void SupportsConstantOptions()
+        public void SupportsOptionalConstantOptions()
         {
             // TODO: switch exceptions to contain target-property instead of longOption and such.
             try
             {
-                Parser<ConstStruct>.Parse(new []{ "-d" });
+                Parser<OptionalConstStruct>.Parse(new []{ "-d" });
+            }
+            catch (MissingConstantOption)
+            {
+                Assert.False(true);
+            }
+            
+            try
+            {
+                Parser<OptionalConstStruct>.Parse(new []{ "-c", "2", "-d" });
+                Assert.False(true);
+            }
+            catch (MissingConstantOption)
+            {
+                Parser<OptionalConstStruct>.Parse(new []{ "-c", "1", "-d" });
+            }
+        }
+        
+        class RequiredConstStruct
+        {
+            [Constant(1)]
+            [Required]
+            public int? ConstantOrDie;
+            
+            public bool? Detach;
+        }
+        
+        [Fact]
+        public void SupportsRequiredConstantOptions()
+        {
+            // TODO: switch exceptions to contain target-property instead of longOption and such.
+            try
+            {
+                Parser<RequiredConstStruct>.Parse(new []{ "-d" });
                 Assert.False(true);
             }
             catch (MissingConstantOption)
@@ -689,12 +768,12 @@ namespace TestClux
             
             try
             {
-                Parser<ConstStruct>.Parse(new []{ "-c", "2", "-d" });
+                Parser<RequiredConstStruct>.Parse(new []{ "-c", "2", "-d" });
                 Assert.False(true);
             }
             catch (MissingConstantOption)
             {
-                Parser<ConstStruct>.Parse(new []{ "-c", "1", "-d" });
+                Parser<RequiredConstStruct>.Parse(new []{ "-c", "1", "-d" });
             }
         }
         
@@ -862,6 +941,16 @@ namespace TestClux
             throw new NotSupportedException();
         }
 
+        [Fact(Skip="Not yet implemented")]
+        public void ShouldHaveOptionalAttributeThatIsInverseOfRequired()
+        {
+        }
+        
+        [Fact(Skip="Not yet implemented")]
+        public void NamedBoolsShouldBeOptionalByDefault()
+        {
+        }
+        
         [Fact(Skip="Not yet implemented")]
         public void ShouldTreatListAndArrayIndentically()
         {

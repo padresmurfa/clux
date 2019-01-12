@@ -9,17 +9,17 @@ Clux derives its deterministic command-line syntax from class/struct definitions
 ```C#
 using Clux;
 
-class Hello
+public class Hello
 {
     [Positional]
     [Usage("The greeting")]
-    string Hello;
+    public string Hello;
 
     [Usage("The craziness factor")]
-    uint16? Crazy;
+    public uint16? Crazy;
 
     [Usage("The world that is crazy")]
-    string World;
+    public string World;
 }
 
 // usage: program [hello] [-c <crazy>] [-w <world>]
@@ -27,15 +27,18 @@ class Hello
 //   -c, --crazy: The craziness factor
 //   -w, --world: The world that is crazy
 
-var args = new [] {
-    "--crazy", "3",
-    "-w", "Earth"
-};
+public static void Main(string[] args)
+{
+    args = args ?? new [] {
+        "--crazy", "3",
+        "-w", "Earth"
+    };
 
-var parsed = Parser<Foo>.Parse(args);
+    var parsed = Parser<Hello>.Parse(args);
 
-Console.WriteLine($"craziness: {parser.Crazy}");
-Console.WriteLine($"    world: {parser.World}");
+    Console.WriteLine($"craziness: {parser.Crazy}");
+    Console.WriteLine($"    world: {parser.World}");
+}
 
 // Output:
 // ------------
@@ -64,15 +67,15 @@ Any property that is decorated with the **[Positional]** attribute will be inter
 
 #### Example
 ```C#
-class Args
+public class Args
 {
     [Positional]
     [Usage("The greeting")]
-    string Hello;
+    public string Hello;
 
     [Positional]
     [Usage("The world")]
-    string World;
+    public string World;
 }
 
 // usage: program [hello] [world]
@@ -90,13 +93,13 @@ A named argument can be specified either by _long option_ (e.g. _--foo_) or by _
 
 #### Example
 ```C#
-class Args
+public class Args
 {
     [Usage("The greeting")]
-    string Hello;
+    public string Hello;
 
     [Usage("The world")]
-    string World;
+    public string World;
 }
 
 // usage: program [-h <hello>] [-w <world>]
@@ -108,18 +111,18 @@ Named arguments can occur in any order on the command-line, so long as they appe
 
 #### Example
 ```C#
-class Args
+public class Args
 {
     [Usage("The greeting")]
     [Positional]
-    string Hel;
+    public string Hel;
 
     [Usage("The greeting, part 2")]
-    string Lo;
+    public string Lo;
 
     [Usage("The world")]
     [Positional]
-    string World;
+    public string World;
 }
 
 //   valid: --lo hello hello world
@@ -132,9 +135,9 @@ Named options may optionally be specified on the command-line using the equals o
 
 #### Example
 ```C#
-class Args
+public class Args
 {
-    string Hello;
+    public string Hello;
 }
 
 //   valid: -h world
@@ -156,9 +159,9 @@ The property FooBlat can therefor by default be passed via the command-line usin
 
 #### Example
 ```C#
-class Args
+public class Args
 {
-    string Hello;
+    public string Hello;
 }
 
 //   valid: --hello world
@@ -214,9 +217,9 @@ Command line arguments are always assumed to be provided by in **local time**, s
 
 #### Example
 ```C#
-class Args
+public class Args
 {
-    DateTime Hello;
+    public DateTime Hello;
 }
 
 // usage: program -h "20181231 120000 000"
@@ -232,12 +235,12 @@ Enumeration values can be specified by name.
 
 #### Example
 ```C#
-enum Blat
+public enum Blat
 {
     arg, smarg, garg
 }
 
-class Foo
+public class Foo
 {
     public Blat Splat;
 }
@@ -254,7 +257,7 @@ Arrays are filled with multiple arguments from the command line.  In the case of
 
 #### Example
 ```C#
-class Foo
+public class Foo
 {
     public string[] SArg;
 }
@@ -263,7 +266,7 @@ class Foo
 // usage: program -s a -s b -s c -s d
 // Assert.CollectionEqual(new string[]{ "a", "b", "c", "d" }, parser.SArg)
 
-class Blat
+public class Blat
 {
     public int[] NArg;
 }
@@ -284,9 +287,9 @@ Integral property types can be provided using decimal, binary, octal, or hex.  W
 
 #### Example
 ```C#
-class Args
+public class Args
 {
-    UInt64 Hello;
+    public UInt64 Hello;
 }
 
 // usage: program -h 15
@@ -296,9 +299,9 @@ class Args
 //
 // Assert.Equal(15, parser.Hello)
 
-class GArgs
+public class GArgs
 {
-    Int16 Hello;
+    public Int16 Hello;
 }
 
 // usage: program -h -20
@@ -320,7 +323,7 @@ Clux detects a positional argument by the - or -- prefix.  Subsequent positional
 
 #### Example
 ```C#
-class Foo
+public class Foo
 {
     public string[] SArg;
     public string Next;
@@ -331,7 +334,7 @@ class Foo
 // usage: program -s a -s b -s c --next d
 // Assert.CollectionEqual(new string[]{ "a", "b", "c" }, parser.SArg)
 
-class Bar
+public class Bar
 {
     public string[] SArg;
 
@@ -343,7 +346,7 @@ class Bar
 // usage: program -s a -s b -s c d
 // Assert.CollectionEqual(new string[]{ "a", "b", "c" }, parser.SArg)
 
-class Blat
+public class Blat
 {
     [Positional]
     public int[] NArg;
@@ -363,14 +366,14 @@ Enumeration values can also be specified by underlying value, where appropriate
 
 #### Example
 ```C#
-enum Bork : uint
+public enum Bork : uint
 {
     arg = 1,
     smarg = 3,
     garg = 8
 }
 
-class Gork
+public class Gork
 {
     public Bork Mork;
 }
@@ -391,38 +394,38 @@ The **[Abbreviation(char)]** attribute can also be used to assign upper-case sho
 
 #### Example
 ```C#
-class Args
+public class Args
 {
-    string Hello;
+    public string Hello;
 }
 //   valid: --hello world
 //   valid: -h world
 // INVALID: -H world
 
-class HArgs
+public class HArgs
 {
     [Abbreviation('H')]
-    string Hello;
+    public string Hello;
 }
 //   valid: --hello world
 //   valid: -H world
 // INVALID: -h world
 
-class QArgs
+public class QArgs
 {
     [Abbreviation('q')]
-    string Hello;
+    public string Hello;
 }
 //   valid: --hello world
 //   valid: -q world
 // INVALID: -h world
 // INVALID: -H world
 
-class AmbiguousArgs
+public class AmbiguousArgs
 {
-    string Hello;
+    public string Hello;
 
-    string Hi;
+    public string Hi;
 }
 //   valid: --hello world
 //   valid: --hi there
@@ -448,35 +451,35 @@ To change this behaviour without decorating individual members, you could requir
 
 #### Example
 ```C#
-class Args
+public class Args
 {
     [Positional]
-    string Hello;
+    public string Hello;
 
-    string World;
+    public string World;
 }
 // usage: program [-w <world>] <hello>
 
 using System.Runtime.InteropServices;
 
 [StructLayout(LayoutKind.Sequential)]
-class SArgs
+public class SArgs
 {
     [Positional]
-    string Hello;
+    public string Hello;
 
-    string World;
+    public string World;
 }
 // usage: program <hello> [-w <world>] 
 
-class SArgs
+public class SArgs
 {
     [Positional]
     [Usage("The greeting")]
-    string Hello;
+    public string Hello;
 
     [Usage("The world")]
-    string World;
+    public string World;
 }
 // usage: program <hello> [-w <world>] 
 
@@ -488,14 +491,138 @@ The declaration order is defined by line number, so you may e.g. create sections
 
 **[Positional]** declarations take note of the line number that they appear on, as do other Clux attributes.  Again, you should be able to create nice sections using this technique with partial classes within a file, while for all intents and purposes your positional arguments will have an undefined position when crossing file boundaries.  Thus again, this should be avoided.
 
-**TODO**: add Optional attribute.
+## A7. Constants
 
-        /*
-            usage declaration
-            accessing remainders
-            help message
-            constants
-            parser unions + accessing results
-            error handling
-        */
+A command line argument can be decorated as Constant, in which case the command line parser will not succeed unless the argument in question has the specified value.
+
+If the argument is optional, then the constant constraint will not be considered violated unless the argument is specified.
+
+Constants are useful in special cases, such as with Parser Unions (see A8), below.
+
+#### Example
+```C#
+public class Args
+{
+    [Positional]
+    public string Hello;
+
+    [Constant("world")]
+    public string World;
+}
+// usage: program <hello> [-w world]
+// program hello -w world
+
+```
+
+## A8. Parser Unions
+
+A Clux parser-union allows you to simultaneously attempt to parse multiple different argument sets, placing the burden of routing on Clux for the convenience of the developer.
+
+Clux will scan through the provided argument types, and invoke the appropriate handler.
+
+#### Example
+
+```C#
+
+    public class MeRun
+    {
+        [Constant("run")]
+        [Positional]
+        [Required]
+        [Usage("The docker command")]
+        public string Command;
         
+        [Usage("The arguments to the 'run' docker command")]
+        [Positional]
+        public string[] Args;
+    }
+    
+    public class MeStop
+    {
+        [Constant("stop")]
+        [Positional]
+        [Required]
+        [Usage("The docker command")]
+        public string Command;
+        
+        [Usage("The arguments to the 'stop' docker command")]
+        [Positional]
+        public string[] Args;
+    }
+    
+    public class MeExec
+    {
+        [Constant("exec")]
+        [Positional]
+        [Required]
+        [Usage("The docker command")]
+        public string Command;
+        
+        [Usage("The arguments to the 'exec' docker command")]
+        [Positional]
+        public string[] Args;
+    }
+
+    public static void Main(string[] ignore)
+    {
+        var parser = Parser<MeRun,MeStop,MeExec>.Create();
+        
+        var stop = new []{ "stop", "bla" };
+        var run = new []{ "run" };
+        var exec = new []{ "exec" };
+
+        var sre = new string[][]{
+            stop, run, exec
+        };
+
+        foreach (var args in sre)
+        {
+            parser.Parse(args)
+                .When((MeStop ms) => {
+                    Assert.Single(ms.Args);
+                    Assert.Equal("bla",ms.Args[0]);
+                .When((MeRun ms) => {
+                    Assert.Null(ms.Args);
+                .When((MeExec ms) => {
+                    Assert.Null(ms.Args);
+                }).Else((e) => {
+                    Assert.True(false);
+                });
+        }
+    }
+```
+
+## A9. Remainders
+
+Clux can provide you with the remainder when parsing fails, if you specifically request it.
+
+```
+
+        public class Foo
+        {
+            [Positional]
+            [Required]
+            [Usage("The command to perform, e.g. run, exec, kill, stop, ...")]
+            public string Verb { get; set; }
+        }
+
+        string[] remainder;
+        try
+        {
+            Parser<Docker>.Parse(out remainder, new string[0] );
+            Assert.False(true);
+        }
+        catch (MissingRequiredOption)
+        {
+            var result = Parser<Docker>.Parse(out remainder, new string[] { "verb" } );
+            Assert.Equal("verb", result.Verb);
+        }
+```
+
+## Error Handling
+
+**TODO**
+
+## Help Messages
+        
+**TODO**

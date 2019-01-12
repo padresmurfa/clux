@@ -125,6 +125,12 @@ namespace Clux
 
             var target = new T();
             var current = args.ToList();
+            
+            string[] tmpRemainder = null;
+            if (returnRemainder)
+            {
+                tmpRemainder = current.ToArray();
+            }
 
             try
             {
@@ -149,11 +155,11 @@ namespace Clux
 
                         current = ApplyOption(current, positionalOption, target);
                     }
-                }
-
-                if (returnRemainder)
-                {
-                    remainder = current.ToArray();
+                    
+                    if (returnRemainder)
+                    {
+                        tmpRemainder = current.ToArray();
+                    }
                 }
                 
                 AssertConstants();
@@ -164,21 +170,21 @@ namespace Clux
                 {
                     throw;
                 }
-                remainder = current.ToArray();
             }
+            remainder = tmpRemainder;
 
             var missing = this.All.FirstOrDefault(x => x.Required && !x.Touched);
             if (missing != null)
             {
                 throw new MissingRequiredOption(missing.LongOption);
             }
-
+            
             return target;
         }
         
         void AssertConstants()
         {
-            var constants = this.All.Where(x => x.Constant != null);
+            var constants = this.All.Where(x => x.Constant != null && x.Required);
             foreach (var constant in constants)
             {
                 if (!constant.Touched)
