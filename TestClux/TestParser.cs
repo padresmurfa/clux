@@ -837,6 +837,51 @@ namespace TestClux
             
             public string Arg1;
         }
+        
+        [Fact(Skip="Not yet implemented")]
+        public void ShouldBeAbleToMarkFieldsAsIgnore()
+        {
+            throw new NotSupportedException();
+        }
+        
+        [Fact(Skip="Not yet implemented")]
+        public void ShouldBeAbleToHandleReadOnlyOrWriteOnlyProperties()
+        {
+            throw new NotSupportedException();
+        }
+                
+        [Fact(Skip="Not yet implemented")]
+        public void ShouldBeAbleToDecorateDateTimeWithUtcInputOrLocalOutput()
+        {
+            throw new NotSupportedException();
+        }
+        
+        [Fact(Skip="Not yet implemented")]
+        public void ShouldBeAbleToInputCalendarAndPossiblyeTzInfo()
+        {
+            throw new NotSupportedException();
+        }
+
+        [Fact(Skip="Not yet implemented")]
+        public void ShouldTreatListAndArrayIndentically()
+        {
+            /*
+                i.e.
+                
+                    struct Foo
+                    {
+                        public string[] Blat;
+                    }
+                
+                should be identical to:
+                
+                    struct Foo
+                    {
+                        public List<string> Blat;
+                    }
+            */
+            throw new NotSupportedException();
+        }
 
         [Fact]
         public void DescribesArgsInCorrectOrderInHelp()

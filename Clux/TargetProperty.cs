@@ -125,6 +125,14 @@ namespace Clux
                 {
                     this.Order += unchecked((UInt32)memberType.MetadataToken);
                 }
+                else
+                {
+                    this.Order += (ulong)memberType.FullName.GetHashCode();
+                }
+            }
+            else
+            {
+                this.Order += (ulong)memberType.FullName.GetHashCode();
             }
         }
 
