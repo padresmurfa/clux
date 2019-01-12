@@ -941,12 +941,40 @@ namespace TestClux
             }
         }
         
-        [Fact(Skip="Not yet implemented")]
-        public void ShouldBeAbleToHandleReadOnlyOrWriteOnlyProperties()
+        public class IgnoreROWO
         {
-            throw new NotSupportedException();
+            public string IgnoreMe { get; private set; }
+
+            public string IgnoreMeToo { private get; set; }
+
+            [Abbreviation('I')]            
+            public string IgnoreMeNot;
         }
-                
+
+        [Fact]
+        public void ShouldIgnoreNonReadableWritableProperties()
+        {
+            var parsed = Parser<IgnoreROWO>.Parse("-I", "ignore-me-not");
+            
+            try
+            {
+                parsed = Parser<IgnoreROWO>.Parse("--ignore-me", "ignore-me");
+                Assert.False(true);
+            }
+            catch (UnknownOption)
+            {
+            }
+            
+            try
+            {
+                parsed = Parser<IgnoreROWO>.Parse("--ignore-me-too", "ignore-me-too");
+                Assert.False(true);
+            }
+            catch (UnknownOption)
+            {
+            }
+        }                
+        
         [Fact(Skip="Not yet implemented")]
         public void ShouldBeAbleToDecorateDateTimeWithUtcInputOrLocalOutput()
         {
@@ -972,6 +1000,8 @@ namespace TestClux
         [Fact(Skip="Not yet implemented")]
         public void ShouldTreatListAndArrayIndentically()
         {
+            // also hashsets, ...
+            
             /*
                 i.e.
                 

@@ -52,6 +52,7 @@ namespace Clux
             public AbbreviationAttribute Abbreviation;
             public PositionalAttribute Positional;
             public IgnoreAttribute Ignore;
+            public bool IsTargettable { get; private set; }
             
             public IEnumerable<OrderedAttribute> TargetAttributes
             {
@@ -86,6 +87,8 @@ namespace Clux
                 Abbreviation = (AbbreviationAttribute)field.GetCustomAttribute(typeof(AbbreviationAttribute));
                 Positional = (PositionalAttribute)field.GetCustomAttribute(typeof(PositionalAttribute));
                 Ignore = (IgnoreAttribute)field.GetCustomAttribute(typeof(IgnoreAttribute));
+                
+                this.IsTargettable = true;
             }
             
             public Attributes(PropertyInfo property)
@@ -96,6 +99,11 @@ namespace Clux
                 Abbreviation = (AbbreviationAttribute)property.GetCustomAttribute(typeof(AbbreviationAttribute));
                 Positional = (PositionalAttribute)property.GetCustomAttribute(typeof(PositionalAttribute));
                 Ignore = (IgnoreAttribute)property.GetCustomAttribute(typeof(IgnoreAttribute));
+                
+                var writable = property.GetSetMethod() != null;
+                var readable = property.GetGetMethod() != null;
+                
+                this.IsTargettable = readable && writable;
             }
         }
 
@@ -120,7 +128,7 @@ namespace Clux
                 throw new ArgumentNullException(nameof(memberType));
             }
             
-            this.Ignore = attributes.Ignore != null;
+            this.Ignore = (attributes.Ignore != null) || (!attributes.IsTargettable);
             
             if (!this.Ignore)
             {

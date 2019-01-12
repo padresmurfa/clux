@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>Clux</PackageId>
-    <PackageVersion>1.0.0.3</PackageVersion>
+    <PackageVersion>1.0.0.4</PackageVersion>
     <Authors>David Brandt</Authors>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseType>Unlicense</PackageLicenseType>
@@ -12,9 +12,9 @@
     <Owners>PadreSmurfa</Owners>
     <RepositoryUrl>https://github.com/padresmurfa/clux</RepositoryUrl>
     <PackageProjectUrl>https://github.com/padresmurfa/clux</PackageProjectUrl>
-    <PackageReleaseNotes>This version adds a few bugfixes and the ability to ignore fields or properties in an argument declaration class.</PackageReleaseNotes>
+    <PackageReleaseNotes>This version adds support for ignoring properties that are deemed read-only or write-only.</PackageReleaseNotes>
     <Summary>A rich, yet developer friendly, C# command line user experience</Summary>
-    <PackageTags>Command Line, Parsing, Args, Arguments</PackageTags>
+    <PackageTags>Command, Commandline, Command Line, Command Line Arguments, Parsing, Args, Arguments</PackageTags>
     <Title>Command-Line User Experience</Title>
     <Description>The Clux library is intended to help C# developers provide a rich, detailed command-line user-experience with minimal effort</Description>
   </PropertyGroup>

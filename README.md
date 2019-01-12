@@ -49,7 +49,11 @@ public static void Main(string[] args)
 
 ## 1. Properties and Fields
 
-Every public property or field of the template class/struct that is not decorated with an **[Ignore]** attribute will be interpreted by Clux as a command-line argument definition.
+Clux will interpret the following properties and fields as argument declarations:
+
+* all public, protected or private fields
+* and all properties that have an accessible getter and setter
+* excluding fields and properties that are decorated with an **[Ignore]** attribute.
 
 **_No distinction is made between properties and fields by Clux, and both are referred to as properties in the Clux documentation, for simplicity's sake._**
 
