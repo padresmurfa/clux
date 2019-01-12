@@ -703,7 +703,7 @@ namespace TestClux
             {
                 Parser<RemainderError>.Parse(out remainder, new string[] { "verb", "remainder", "jar" } );
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Assert.Equal(2, remainder.Length);
                 
@@ -917,10 +917,28 @@ namespace TestClux
             public string Arg1;
         }
         
-        [Fact(Skip="Not yet implemented")]
-        public void ShouldBeAbleToMarkFieldsAsIgnore()
+        public class IgnoreField
         {
-            throw new NotSupportedException();
+            [Ignore]
+            public string IgnoreMe;
+
+            [Abbreviation('I')]            
+            public string IgnoreMeNot;
+        }
+        
+        [Fact]
+        public void ShouldBeAbleToMarkFieldsAsIgnored()
+        {
+            var parsed = Parser<IgnoreField>.Parse("-I", "ignore-me-not");
+            
+            try
+            {
+                parsed = Parser<IgnoreField>.Parse("--ignore-me", "ignore-me");
+                Assert.False(true);
+            }
+            catch (UnknownOption)
+            {
+            }
         }
         
         [Fact(Skip="Not yet implemented")]

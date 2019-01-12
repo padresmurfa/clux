@@ -49,7 +49,7 @@ public static void Main(string[] args)
 
 ## 1. Properties and Fields
 
-Every public property or field of the template class/struct will be interpreted by Clux as a command-line argument definition.
+Every public property or field of the template class/struct that is not decorated with an **[Ignore]** attribute will be interpreted by Clux as a command-line argument definition.
 
 **_No distinction is made between properties and fields by Clux, and both are referred to as properties in the Clux documentation, for simplicity's sake._**
 
@@ -177,7 +177,9 @@ Boolean short options (aka flags) can be merged/squashed.  Thus the following co
 
 ## 3. Optional or Required?
 
-Properties that use a reference or nullable type, such as _arrays_, _strings_ or _ints?_ will be considered optional by Clux by default.  Other properties will be considered to be required by default.  An optional property can be declared to be required through using the **[Required]** attribute.
+Properties that use a reference or nullable type, such as _arrays_, _strings_ or _ints?_ will be considered optional by Clux by default.  Other properties will be considered to be required by default.
+
+An optional property can be declared to be required through using the **[Required]** attribute.
 
 ## 4. Basic property types
 
