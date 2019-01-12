@@ -11,6 +11,7 @@ using Clux;
 
 class Hello
 {
+    [Positional]
     [Usage("The greeting")]
     string Hello;
 
