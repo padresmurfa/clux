@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Xunit;
 using System.Linq;
 using Clux;
@@ -630,7 +631,8 @@ namespace TestClux
         [Fact]
         public void ProvidesHelpMessageShortOptionUsage()
         {
-            var lines = Parser<DockerRun>.GetHelpMessage("docker-run").Split('\n');
+            var help = Parser<DockerRun>.GetHelpMessage("docker-run");
+            var lines = help.Split('\n');
 
             Assert.True( lines.Any(line => line.Contains(" -a,") && line.Contains("Attach to STDIN, STDOUT or STDERR")) );
         }
@@ -975,18 +977,6 @@ namespace TestClux
             }
         }                
         
-        [Fact(Skip="Not yet implemented")]
-        public void ShouldBeAbleToDecorateDateTimeWithUtcInputOrLocalOutput()
-        {
-            throw new NotSupportedException();
-        }
-        
-        [Fact(Skip="Not yet implemented")]
-        public void ShouldBeAbleToInputCalendarAndPossiblyeTzInfo()
-        {
-            throw new NotSupportedException();
-        }
-
         class OptionalOverrideTests
         {
             [Clux.Optional]            
@@ -1105,53 +1095,6 @@ namespace TestClux
             Assert.Null(parsed.nullable);
         }
         
-        struct BoxingUnboxingTest
-        {
-            [Positional]
-            public bool foo;
-            
-            public bool notNullable;
-            
-            public bool? nullable;
-        }
-
-        [Fact(Skip="Not yet implemented")]
-        // [Fact]
-        public void ShouldBeImmuneToBoxingUnboxingErrors()
-        {
-            // see Chris Shain's descussion here: https://stackoverflow.com/questions/9694404/propertyinfo-setvalue-not-working-but-no-errors
-            
-            var parsed = Parser<BoxingUnboxingTest>.Parse(new []{ "true"});
-            
-            Assert.True(parsed.foo);
-            Assert.False(parsed.notNullable);
-            Assert.Null(parsed.nullable);
-        }
-        
-        
-        [Fact(Skip="Not yet implemented")]
-        public void ShouldTreatListAndArrayIndentically()
-        {
-            // also hashsets, ...
-            
-            /*
-                i.e.
-                
-                    struct Foo
-                    {
-                        public string[] Blat;
-                    }
-                
-                should be identical to:
-                
-                    struct Foo
-                    {
-                        public List<string> Blat;
-                    }
-            */
-            throw new NotSupportedException();
-        }
-
         [Fact]
         public void DescribesArgsInCorrectOrderInHelp()
         {
@@ -1174,6 +1117,75 @@ namespace TestClux
             
             help = parser4.GetHelpMessage("order");
             Assert.Equal("usage: order [--arg4 <str>] [--arg3 <str>] [--arg2 <str>] [--arg1 <str>]", help.Split("\n").First());
+        }
+
+        struct BoxingUnboxingTest
+        {
+            [Positional]
+            public bool foo;
+            
+            public bool notNullable;
+            
+            public bool? nullable;
+        }
+
+        [Fact]
+        public void ShouldBeImmuneToBoxingUnboxingErrors()
+        {
+            // see Chris Shain's descussion here: https://stackoverflow.com/questions/9694404/propertyinfo-setvalue-not-working-but-no-errors
+            
+            var parsed = Parser<BoxingUnboxingTest>.Parse(new []{ "true"});
+            
+            Assert.True(parsed.foo);
+            Assert.False(parsed.notNullable);
+            Assert.Null(parsed.nullable);
+        }
+        
+        [Fact(Skip="Not yet implemented")]
+        public void ShouldBeAbleToDecorateDateTimeWithUtcInputOrLocalOutput()
+        {
+            throw new NotSupportedException();
+        }
+        
+        [Fact(Skip="Not yet implemented")]
+        public void ShouldBeAbleToInputCalendarAndPossiblyeTzInfo()
+        {
+            throw new NotSupportedException();
+        }
+        
+        class ListTest
+        {
+            [Positional]
+            public List<string> strings;
+            
+            public List<string> list;
+            
+            public HashSet<string> hashset;
+        }
+        
+        [Fact]
+        public void ShouldTreatListAndArrayAndHashSetIndentically()
+        {
+            var parsed = Parser<ListTest>.Parse("a", "b", "c");
+            
+            Assert.Equal(3, parsed.strings.Count());
+            Assert.Equal("a", parsed.strings[0]);
+            Assert.Equal("b", parsed.strings[1]);
+            Assert.Equal("c", parsed.strings[2]);
+            
+            parsed = Parser<ListTest>.Parse("-l", "a", "-l", "b", "c");
+            
+            Assert.Equal(3, parsed.list.Count());
+            Assert.Equal("a", parsed.list[0]);
+            Assert.Equal("b", parsed.list[1]);
+            Assert.Equal("c", parsed.list[2]);
+            
+            parsed = Parser<ListTest>.Parse("-h", "a", "-h", "b", "c");
+            
+            Assert.Equal(3, parsed.hashset.Count());
+            Assert.Contains("a", parsed.hashset);
+            Assert.Contains("b", parsed.hashset);
+            Assert.Contains("c", parsed.hashset);
         }
     }
 }

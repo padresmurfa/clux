@@ -11,6 +11,8 @@ namespace Clux
     public partial class ParserInstance<T> : IParserUnionParserInstance
         where T : new()
     {
+        private object target;
+        
         public ParserInstance()
         {
             if (IsParserUnion)
@@ -80,14 +82,14 @@ namespace Clux
         
         T ParseUnion(out string[] remainder, params string[] args)
         {
-            var tmp = new T();
+            target = (object)new T();
             List<ParserException> pexs = new List<ParserException>();
-            foreach (var parser in ((IParserUnion)tmp).Parsers)
+            foreach (var parser in ((IParserUnion)target).Parsers)
             {
                 try
                 {
-                    parser.Parse((IParserUnion)tmp, out remainder, args);
-                    return tmp;
+                    parser.Parse((IParserUnion)target, out remainder, args);
+                    return (T)target;
                 }
                 catch (ParserException pex)
                 {
@@ -123,7 +125,7 @@ namespace Clux
             Reset();
             var position = 0;
 
-            var target = new T();
+            target = (object)new T();
             var current = args.ToList();
             
             string[] tmpRemainder = null;
@@ -143,17 +145,17 @@ namespace Clux
                     }
                     else if (this.ByShortOption.GetShortOption(first, out var shortOption))
                     {
-                        current = ApplyOption(current, shortOption, target);
+                        current = ApplyOption(current, shortOption);
                     }
                     else if (this.ByLongOption.GetLongOption(first, out var longOption))
                     {
-                        current = ApplyOption(current, longOption, target);
+                        current = ApplyOption(current, longOption);
                     }
                     else
                     {
                         var positionalOption = this.ByPosition.Get(position++, this.All);
 
-                        current = ApplyOption(current, positionalOption, target);
+                        current = ApplyOption(current, positionalOption);
                     }
                     
                     if (returnRemainder)
@@ -179,7 +181,7 @@ namespace Clux
                 throw new MissingRequiredOption(missing.LongOption);
             }
             
-            return target;
+            return (T)target;
         }
         
         void AssertConstants()
@@ -194,23 +196,41 @@ namespace Clux
             }
         }
 
-        List<string> ApplyOption(List<string> args, TargetProperty<T> property, T target)
+        List<string> ApplyOption(List<string> args, TargetProperty<T> property)
         {
-            if (property.TargetType.IsArray)
+            var isArray = property.TargetType.IsArray;
+            if (isArray)
             {
-                return ApplyArrayOption(args, property, target);
+                var elementType = property.TargetType.GetElementType();
+            
+                return ApplyCollectionOption(args, property, elementType, CreateOrAppendToArray);
             }
             else if (typeof(bool).IsAssignableFrom(property.TargetType) || typeof(bool?).IsAssignableFrom(property.TargetType))
             {
-                return ApplyBooleanOption(args, property, target);
+                return ApplyBooleanOption(args, property);
             }
-            else
+            else if (property.TargetType.IsGenericType)
             {
-                return ApplyPositionalOption(args, property, target);
+                var elementType = property.TargetType.GenericTypeArguments.First();
+                    
+                var isList = typeof(IList).IsAssignableFrom(property.TargetType);
+                if (isList)
+                {
+                    return ApplyCollectionOption(args, property, elementType, CreateOrAppendToList);
+                }
+                
+                var hashSetType = typeof(HashSet<>);
+                var dude = hashSetType.MakeGenericType(new []{ elementType });
+                if (property.TargetType.IsAssignableFrom(dude))
+                {
+                    return ApplyCollectionOption(args, property, elementType, CreateOrAppendToSet);
+                }
             }
+            
+            return ApplyPositionalOption(args, property);
         }
 
-        private List<string> ApplyPositionalOption(List<string> args, TargetProperty<T> property, T target)
+        private List<string> ApplyPositionalOption(List<string> args, TargetProperty<T> property)
         {
             if (property.Touched)
             {
@@ -226,7 +246,7 @@ namespace Clux
             return args;
         }
 
-        private List<string> ApplyBooleanOption(List<string> args, TargetProperty<T> property, T target)
+        private List<string> ApplyBooleanOption(List<string> args, TargetProperty<T> property)
         {
             if (!property.Position.HasValue)
             {
@@ -254,14 +274,12 @@ namespace Clux
             return args;
         }
 
-        private List<string> ApplyArrayOption(List<string> args, TargetProperty<T> property, T target)
+        private List<string> ApplyCollectionOption(List<string> args, TargetProperty<T> property, Type elementType, Func<TargetProperty<T>,Type,List<object>,object> createOrAppendToCollection)
         {
             if (!property.Position.HasValue)
             {
                 args.RemoveAt(0);
             }
-
-            var elementType = property.TargetType.GetElementType();
 
             var remainingPositionals = this.ByPosition.Remaining(property.Position);
             var take = args.Count() - remainingPositionals;
@@ -290,42 +308,90 @@ namespace Clux
                     args.Clear();
                 }
 
-                var arrayType = elementType.MakeArrayType();
-
-                int previousLength = 0;
-
-                object previous = null;
-                if (property.Touched)
-                {
-                    previous = property.GetValue(target);
-                    var arrayLength = arrayType.GetProperty("Length");
-                    previousLength = (int)arrayLength.GetValue(previous);
-                }
-
-                var array = arrayType
-                    .GetConstructor(new[] { typeof(int) })
-                     .Invoke(new object[] { used.Count() + previousLength });
-
-                var setItem = arrayType.GetMethod("Set");
-                var getItem = arrayType.GetMethod("Get");
-
-                var cursor = 0;
-                for (; cursor < previousLength;)
-                {
-                    var previousElement = getItem.Invoke(previous, new object[] { cursor });
-                    setItem.Invoke(array, new[] { cursor++, previousElement });
-                }
-                foreach (var element in used)
-                {
-                    setItem.Invoke(array, new[] { cursor++, element });
-                }
+                var array = createOrAppendToCollection(property, elementType, used);
 
                 property.SetValue(target, array);
             }
-            
+
             return args;
         }
 
+        private object CreateOrAppendToArray(TargetProperty<T> property, Type elementType, List<object> append)
+        {
+            var arrayType = elementType.MakeArrayType();
+
+            int previousLength = 0;
+
+            object previous = null;
+            if (property.Touched)
+            {
+                previous = property.GetValue(target);
+                var arrayLength = arrayType.GetProperty("Length");
+                previousLength = (int)arrayLength.GetValue(previous);
+            }
+
+            var array = arrayType
+                .GetConstructor(new[] { typeof(int) })
+                 .Invoke(new object[] { append.Count() + previousLength });
+
+            var setItem = arrayType.GetMethod("Set");
+            var getItem = arrayType.GetMethod("Get");
+
+            var cursor = 0;
+            for (; cursor < previousLength;)
+            {
+                var previousElement = getItem.Invoke(previous, new object[] { cursor });
+                setItem.Invoke(array, new[] { cursor++, previousElement });
+            }
+            foreach (var element in append)
+            {
+                setItem.Invoke(array, new[] { cursor++, element });
+            }
+
+            return array;
+        }
+        
+        private object CreateOrAppendToList(TargetProperty<T> property, Type elementType, List<object> append)
+        {
+            IList list = null;
+            if (property.Touched)
+            {
+                list = (IList)property.GetValue(target);
+            }
+            else
+            {
+                var listType = typeof(List<>);
+                var constructedListType = listType.MakeGenericType(elementType);
+                list = (IList)Activator.CreateInstance(constructedListType);
+            }
+            foreach (var item in append)
+            {
+                list.Add(item);
+            }
+            return list;
+        }
+
+        private object CreateOrAppendToSet(TargetProperty<T> property, Type elementType, List<object> append)
+        {
+            object collection = null;
+            if (property.Touched)
+            {
+                collection = property.GetValue(target);
+            }
+            else
+            {
+                var hashSetType = typeof(HashSet<>);
+                var constructedListType = hashSetType.MakeGenericType(elementType);
+                collection = Activator.CreateInstance(constructedListType);
+            }
+            var add = collection.GetType().GetMethod("Add", new Type[]{ elementType });
+            foreach (var item in append)
+            {
+                add.Invoke(collection, new object[]{ item });
+            }
+            return collection;
+        }
+        
         List<string> GetPositionalValue(string propertyName, bool isPositional, List<string> args, out string val)
         {
             var sKey = args.First();

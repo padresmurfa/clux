@@ -260,7 +260,7 @@ namespace Clux
             }
         }
 
-        public void SetValue(T instance, object value)
+        public void SetValue(object instance, object value)
         {
             if (this.Constant != null)
             {
@@ -291,7 +291,7 @@ namespace Clux
             }
         }
 
-        public object GetValue(T instance)
+        public object GetValue(object instance)
         {
             var pi = typeof(T).GetProperty(Name);
             if (pi != null)

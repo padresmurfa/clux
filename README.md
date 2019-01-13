@@ -230,6 +230,8 @@ The following special property types are supported as arguments by Clux:
 | date/time | DateTime |
 | enumeration | ... |
 | array | e.g. int[] |
+| list | e.g. List\<string\> |
+| hashset | e.g. HashSet\<int\> |
 
 ### 5.1. Date/Time types
 
@@ -300,6 +302,113 @@ public class Blat
 ```
 
 Arrays, as with other nullables, are optional by default.  
+
+### 6. Help Messages
+
+Clux will automatically generate a usage help message upon request.
+
+#### Example
+
+```C#
+
+enum AttachTo
+{
+    Stdin,
+    Stdout,
+    Stderr
+}
+
+class DockerRun
+{
+    [Usage("Run container in background and print container ID")]
+    public bool? Detach;
+
+    [Usage("Automatically remove the container when it exits")]
+    public bool? Rm;
+    
+    [Usage("Keep STDIN open even if not attached")]
+    public bool? Interactive;
+
+    [Usage("Allocate a pseudo-TTY")]
+    public bool? Tty;
+    
+    [Usage("Add a custom host-to-IP mapping (host:ip)")]
+    public string AddHost;
+
+    [Abbreviation('a')]
+    [Usage("Attach to STDIN, STDOUT or STDERR")]
+    public AttachTo? Attach;
+
+    [Usage("Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)")]
+    public int? BlkioWeight;
+    
+    [Usage("Container host name")]
+    public string Hostname;
+    
+    [Usage("Assign a name to the container")]
+    public string Name;
+
+    [Usage("Publish a container’s port(s) to the host")]
+    public string[] Publish;
+
+    [Usage("Username or UID (format: <name|uid>[:<group|gid>])")]
+    public string User;
+
+    [Usage("Working directory inside the container")]
+    public string Workdir;
+
+    [Positional]
+    [Required]
+    [Usage("The docker image to run")]
+    public string Image;
+
+    [Positional]
+    [Usage("The command to run in the docker image")]
+    public string Command;
+
+    [Positional]
+    [Usage("Any optional arguments to pass to the command in the docker image")]
+    public string[] Args { get; set; }
+}
+
+try
+{
+    Parser<DockerRun>.Parse()
+}
+catch (ParserException)
+{
+    var help = Parser<DockerRun>.GetHelpMessage("docker-run");
+
+    foreach (var line in help.Split('\n'))
+    {
+        Console.WriteLine(line);
+    }
+}
+
+/*
+
+OUTPUT:
+-----------------------------------------------------------------------------------
+usage: docker-run [-drit] [--add-host <str>] [-a (stdin|stdout|stderr)] [-b <n>] [-h <str>] [-n <str>] [-p { <str> ... }] [-u <str>] [-w <str>] <image> [command] [args { <str> ... }]
+
+  -a, --attach (stdin|stdout|stderr): Attach to STDIN, STDOUT or STDERR
+  --add-host <str>:                   Add a custom host-to-IP mapping (host:ip)
+  [args { <str> ... }]:               Any optional arguments to pass to the command in the docker image
+  -b, --blkio-weight <n>:             Block IO (relative weight), between 10 and 1000, or 0 to disable (default 0)
+  [command]:                          The command to run in the docker image
+  -d, --detach:                       Run container in background and print container ID
+  -h, --hostname <str>:               Container host name
+  -i, --interactive:                  Keep STDIN open even if not attached
+  <image>:                            The docker image to run
+  -n, --name <str>:                   Assign a name to the container
+  -p, --publish { <str> ... }:        Publish a container’s port(s) to the host
+  -r, --rm:                           Automatically remove the container when it exits
+  -t, --tty:                          Allocate a pseudo-TTY
+  -u, --user <str>:                   Username or UID (format: <name|uid>[:<group|gid>])
+  -w, --workdir <str>:                Working directory inside the container
+
+*/
+```        
 
 # Advanced Topics
 
@@ -643,8 +752,4 @@ Clux can provide you with the remainder when parsing fails, if you specifically 
 
 ## Error Handling
 
-**TODO**
-
-## Help Messages
-        
 **TODO**
