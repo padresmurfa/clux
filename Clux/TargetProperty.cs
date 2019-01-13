@@ -52,6 +52,7 @@ namespace Clux
             public AbbreviationAttribute Abbreviation;
             public PositionalAttribute Positional;
             public IgnoreAttribute Ignore;
+            public OptionalAttribute Optional;
             public bool IsTargettable { get; private set; }
             
             public IEnumerable<OrderedAttribute> TargetAttributes
@@ -87,6 +88,7 @@ namespace Clux
                 Abbreviation = (AbbreviationAttribute)field.GetCustomAttribute(typeof(AbbreviationAttribute));
                 Positional = (PositionalAttribute)field.GetCustomAttribute(typeof(PositionalAttribute));
                 Ignore = (IgnoreAttribute)field.GetCustomAttribute(typeof(IgnoreAttribute));
+                Optional = (OptionalAttribute)field.GetCustomAttribute(typeof(OptionalAttribute));
                 
                 this.IsTargettable = true;
             }
@@ -99,6 +101,7 @@ namespace Clux
                 Abbreviation = (AbbreviationAttribute)property.GetCustomAttribute(typeof(AbbreviationAttribute));
                 Positional = (PositionalAttribute)property.GetCustomAttribute(typeof(PositionalAttribute));
                 Ignore = (IgnoreAttribute)property.GetCustomAttribute(typeof(IgnoreAttribute));
+                Optional = (OptionalAttribute)property.GetCustomAttribute(typeof(OptionalAttribute));
                 
                 var writable = property.GetSetMethod() != null;
                 var readable = property.GetGetMethod() != null;
@@ -154,21 +157,41 @@ namespace Clux
 
         private void SetRequired(Attributes attributes, Type memberType)
         {
+            var isExplicitlyOptional = attributes.Optional != null;
             var isExplicitlyRequired = attributes.Required != null;
+            
+            if (isExplicitlyOptional && isExplicitlyRequired)
+            {
+                throw new InvalidOptionDeclaration(this.LongOption);
+            }
+            
             if (isExplicitlyRequired)
             {
                 this.Required = true;
             }
+            else if (isExplicitlyOptional)
+            {
+                this.Required = false;
+            }
             else
             {
-                var isNullableType = (!memberType.IsValueType) || (null != Nullable.GetUnderlyingType(memberType));
-                if (!isNullableType)
+                var isNamedBool = memberType.IsValueType && typeof(bool).IsAssignableFrom(memberType) && attributes.Positional == null;
+                if (isNamedBool)
                 {
-                    this.Required = true;
+                    this.Required = false;
                 }
                 else
                 {
-                    this.Required = false;
+                    var isRefType = !memberType.IsValueType;
+                    var isNullableType = null != Nullable.GetUnderlyingType(memberType);
+                    if (isRefType || isNullableType)
+                    {
+                        this.Required = false;
+                    }
+                    else
+                    {
+                        this.Required = true;
+                    }
                 }
             }
         }

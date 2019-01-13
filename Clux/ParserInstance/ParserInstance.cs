@@ -226,7 +226,7 @@ namespace Clux
             return args;
         }
 
-        private static List<string> ApplyBooleanOption(List<string> args, TargetProperty<T> property, T target)
+        private List<string> ApplyBooleanOption(List<string> args, TargetProperty<T> property, T target)
         {
             if (!property.Position.HasValue)
             {
@@ -237,7 +237,19 @@ namespace Clux
             {
                 throw new DuplicateOption(property.LongOption);
             }
-            property.SetValue(target, true);
+            
+            if (property.Position.HasValue)
+            {
+                string sArg;
+                args = GetPositionalValue(property.LongOption, property.Position.HasValue, args, out sArg);
+                
+                var arg = new ParserArg<T>(property.LongOption, property.TargetType, sArg).ParseArg();
+                property.SetValue(target, arg);
+            }
+            else
+            {
+                property.SetValue(target, true);
+            }
             
             return args;
         }

@@ -181,9 +181,25 @@ Boolean short options (aka flags) can be merged/squashed.  Thus the following co
 
 ## 3. Optional or Required?
 
-Properties that use a reference or nullable type, such as _arrays_, _strings_ or _ints?_ will be considered optional by Clux by default.  Other properties will be considered to be required by default.
+Properties that use a reference or nullable type, such as _arrays_, _strings_ or _ints?_ will be considered optional by Clux by default.  
 
-An optional property can be declared to be required through using the **[Required]** attribute.
+Named bools will also be considered optional by default.
+
+Other properties will be considered to be required by default.
+
+A property that would be optional by default can be declared to be required through using the **[Required]** attribute.  Inversely, a property that would be required by default can be declared to be optional through using the **[Optional]** attribute.
+
+#### To summarize:
+
+| Property        | Optional | Required |
+| ------------- |:-------------:|:-----------:|
+| string | x | |
+| named bool | x | |
+| positional bool | | x |
+| any array[] | x | |
+| any nullable? | x | |
+| decorated with [Optional] | x | |
+| decorated with [Required] | | x |
 
 ## 4. Basic property types
 
@@ -205,15 +221,15 @@ The following basic property types are supported as arguments by Clux:
 | double-precision floating point | Double | yes |
 | fixed point decimal | Decimal | yes |
 
-## 5. Complex property types
+## 5. Special property types
 
-The following complex property types are supported as arguments by Clux:
+The following special property types are supported as arguments by Clux:
 
-| Type        | C#           | Nullable?  |
-| ------------- |:-------------:| :-----:|
-| date/time | DateTime | yes |
-| enumeration | ... | yes |
-| array | ... | N/A |
+| Type        | C#           |
+| ------------- |:-------------:|
+| date/time | DateTime |
+| enumeration | ... |
+| array | e.g. int[] |
 
 ### 5.1. Date/Time types
 

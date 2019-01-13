@@ -45,6 +45,30 @@ namespace Clux
             return Enum.ToObject(targetType, (dynamic)underlyingValue);
         }
 
+        object ParseBool()
+        {
+            var argLower = arg.ToLowerInvariant();
+            
+            switch (argLower)
+            {
+                case "0":
+                case "f":
+                case "false":
+                case "n":
+                case "no":
+                    return false;
+                    
+                case "1":
+                case "t":
+                case "true":
+                case "y":
+                case "yes":
+                    return true;
+            }
+            
+            throw new InvalidOptionValue(longOption);
+        }
+        
         object ParseDateTime()
         {
             try
@@ -139,7 +163,7 @@ namespace Clux
             {
                 if (typeof(bool).IsAssignableFrom(targetType))
                 {
-                    return true;
+                    return ParseBool();
                 }
                 else if (typeof(string).IsAssignableFrom(targetType))
                 {

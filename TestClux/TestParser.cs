@@ -987,15 +987,147 @@ namespace TestClux
             throw new NotSupportedException();
         }
 
-        [Fact(Skip="Not yet implemented")]
-        public void ShouldHaveOptionalAttributeThatIsInverseOfRequired()
+        class OptionalOverrideTests
         {
+            [Clux.Optional]            
+            public int optionalNotNullable;
+            
+            [Clux.Optional]            
+            public int? optionalNullable;
+            
+            [Required]
+            public int requiredNotNullable;
+            
+            [Required]
+            public int? requiredNullable;
         }
         
-        [Fact(Skip="Not yet implemented")]
+        class OptionalOverrideAndRequired
+        {
+            [Required]
+            [Clux.Optional]
+            public int conflicting;
+        }
+
+        [Fact]
+        public void ShouldHaveOptionalAttributeThatIsInverseOfRequired()
+        {
+            // this should work as a base
+            var parsed = Parser<OptionalOverrideTests>.Parse(new []{
+                "--optional-not-nullable", "1",
+                "--optional-nullable", "2",
+                "--required-not-nullable", "3",
+                "--required-nullable", "4"
+            });
+            Assert.Equal(1, parsed.optionalNotNullable);
+            Assert.Equal(2, parsed.optionalNullable);
+            Assert.Equal(3, parsed.requiredNotNullable);
+            Assert.Equal(4, parsed.requiredNullable);
+
+            // confliction option attributes
+            try
+            {
+                Parser<OptionalOverrideAndRequired>.Parse(new []{ "--conflicting", "1" });
+                Assert.False(true);
+            }
+            catch (InvalidOptionDeclaration)
+            {
+            }
+            
+            parsed = Parser<OptionalOverrideTests>.Parse(new []{
+                //"--optional-not-nullable", "1",
+                "--optional-nullable", "2",
+                "--required-not-nullable", "3",
+                "--required-nullable", "4"
+            });
+            Assert.Equal(0, parsed.optionalNotNullable);
+            Assert.Equal(2, parsed.optionalNullable);
+            Assert.Equal(3, parsed.requiredNotNullable);
+            Assert.Equal(4, parsed.requiredNullable);
+
+            parsed = Parser<OptionalOverrideTests>.Parse(new []{
+                "--optional-not-nullable", "1",
+                //"--optional-nullable", "2",
+                "--required-not-nullable", "3",
+                "--required-nullable", "4"
+            });
+            Assert.Equal(1, parsed.optionalNotNullable);
+            Assert.Null(parsed.optionalNullable);
+            Assert.Equal(3, parsed.requiredNotNullable);
+            Assert.Equal(4, parsed.requiredNullable);
+
+            try
+            {
+                parsed = Parser<OptionalOverrideTests>.Parse(new []{
+                    "--optional-not-nullable", "1",
+                    "--optional-nullable", "2",
+                    //"--required-not-nullable", "3",
+                    "--required-nullable", "4"
+                });
+                Assert.False(true);
+            }
+            catch (MissingRequiredOption)
+            {
+            }
+            
+            try
+            {
+                parsed = Parser<OptionalOverrideTests>.Parse(new []{
+                    "--optional-not-nullable", "1",
+                    "--optional-nullable", "2",
+                    "--required-not-nullable", "3",
+                    //"--required-nullable", "4"
+                });
+                Assert.False(true);
+            }
+            catch (MissingRequiredOption)
+            {
+            }
+        }
+        
+        class NamedBoolsTest
+        {
+            [Positional]
+            public bool foo;
+            
+            public bool notNullable;
+            
+            public bool? nullable;
+        }
+        
+        [Fact]
         public void NamedBoolsShouldBeOptionalByDefault()
         {
+            var parsed = Parser<NamedBoolsTest>.Parse(new []{ "true"});
+            
+            Assert.True(parsed.foo);
+            Assert.False(parsed.notNullable);
+            Assert.Null(parsed.nullable);
         }
+        
+        struct BoxingUnboxingTest
+        {
+            [Positional]
+            public bool foo;
+            
+            public bool notNullable;
+            
+            public bool? nullable;
+        }
+
+        [Fact(Skip="Not yet implemented")]
+        // [Fact]
+        public void ShouldBeImmuneToBoxingUnboxingErrors()
+        {
+            // see Chris Shain's descussion here: https://stackoverflow.com/questions/9694404/propertyinfo-setvalue-not-working-but-no-errors
+            
+            var parsed = Parser<BoxingUnboxingTest>.Parse(new []{ "true"});
+            
+            Assert.True(parsed.foo);
+            Assert.False(parsed.notNullable);
+            Assert.Null(parsed.nullable);
+        }
+        
         
         [Fact(Skip="Not yet implemented")]
         public void ShouldTreatListAndArrayIndentically()
