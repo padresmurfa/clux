@@ -4,15 +4,16 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>Clux</PackageId>
-    <PackageVersion>1.0.0.4</PackageVersion>
+    <PackageVersion>1.0.0.5</PackageVersion>
     <Authors>David Brandt</Authors>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseType>Unlicense</PackageLicenseType>
     <PackageLicenseUrl>http://unlicense.org</PackageLicenseUrl>
     <Owners>PadreSmurfa</Owners>
-    <RepositoryUrl>https://github.com/padresmurfa/clux</RepositoryUrl>
+    <RepositoryUrl>https://github.com/padresmurfa/clux.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/padresmurfa/clux</PackageProjectUrl>
-    <PackageReleaseNotes>This version adds support for ignoring properties that are deemed read-only or write-only.</PackageReleaseNotes>
+    <PackageReleaseNotes>This version adds support for declaring properties as optional that would be required by default, and changes named bools to be optional by default.</PackageReleaseNotes>
     <Summary>A rich, yet developer friendly, C# command line user experience</Summary>
     <PackageTags>Command, Commandline, Command Line, Command Line Arguments, Parsing, Args, Arguments</PackageTags>
     <Title>Command-Line User Experience</Title>
