@@ -235,9 +235,41 @@ The following special property types are supported as arguments by Clux:
 
 ### 5.1. Date/Time types
 
-Date/Time fields must be specified using the format **yyyyMMddHHmmssffffff**, or any logical shorter version of the format.  Whitespace is allowed.
+Date/Time fields must be specified using any of the following formats.  If the date-time matches multiple different formats resulting in different values, then this will be considered an error.  Whitespace is treated leniently, where possible.
 
-Command line arguments are always assumed to be provided by in **local time**, since that is most natural for humans in general.  The internal representation will however always be in **universal time**, since that is more natural for software in general.
+| C# Format        | Example           | Locale in example |
+| -------------:|:-------------|:-----:|
+| yyyyMMddHHmmssffffff | "20181231 121530 123456" | |
+| yyyyMMddHHmmssfffff | "20181231 121530 12345" | |
+| yyyyMMddHHmmssffff | "20181231 121530 1234" | |
+| yyyyMMddHHmmssfff | "20181231 121530 123" | |
+| yyyyMMddHHmmssff | "20181231 121530 12" | |
+| yyyyMMddHHmmssf | "20181231 121530 1" | |
+| yyyyMMddHHmmss | "20181231121530" | |
+| yyyyMMddHHmmss | "20181231121530" | |
+| d | "6/15/2009" | en-US |
+| D | "Monday, June 15, 2009" | en-US |
+| f | "Monday, June 15, 2009 1:45 PM" | en-US |
+| F | "Monday, June 15, 2009 1:45:30 PM" | en-US |
+| g | "6/15/2009 1:45 PM" | en-US |
+| G | "6/15/2009 1:45:30 PM" | en-US |
+| G | "6/15/2009 1:45:30 PM" | en-US |
+| M or m | "June 15" | en-US |
+| O | "2009-06-15T13:45:30.0000000-07:00" | en-US |
+| O | "2009-06-15T13:45:30.0000000Z" | en-US |
+| R or r | "Mon, 15 Jun 2009 20:45:30 GMT" | en-US |
+| s | "2009-06-15T13:45:30" | en-US |
+| t | "1:45 PM" | en-US |
+| T | "1:45:30 PM" | en-US |
+| u | "2009-06-15 13:45:30Z" | en-US |
+| U | "Monday, June 15, 2009 8:45:30 PM" | en-US |
+| Y or y | "June, 2009" | en-US |
+
+**_For more information, see the C# documentation on [Standard Date and Time Format Strings](https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings)_**
+
+Command line arguments are always assumed to be provided by in **local time**, if the format does not indicate otherwise, since that is most natural for humans in general.
+
+The internal representation will however always be in **universal time**, since that is more natural for software in general.
 
 #### Example
 ```C#
@@ -247,10 +279,7 @@ public class Args
 }
 
 // usage: program -h "20181231 120000 000"
-// usage: program -h "20181231 120000000"
-// usage: program -h "20181231 120000"
-// usage: program -h "20181231 1200"
-// usage: program -h 201812311200
+// usage: program -h "6/15/2009 1:45:30 PM"
 ```
 
 ### 5.2. Enumerations

@@ -86,9 +86,53 @@ namespace Clux
                    "yyyyMMdd",
                    "yyyyMM",
                    "yyyy",
+                   
+                   "d",
+                   "D",
+                   "f",
+                   "F",
+                   "g",
+                   "G",
+                   "m",
+                   "M",
+                   "r",
+                   "s",
+                   "t",
+                   "T",
+                   "u",
+                   "U",
+                   "y"
                 };
-
-                return DateTime.ParseExact(arg, dts, null, System.Globalization.DateTimeStyles.AssumeLocal|System.Globalization.DateTimeStyles.AllowWhiteSpaces|System.Globalization.DateTimeStyles.AdjustToUniversal);
+                
+                List<DateTime> possibilities = new List<DateTime>();
+                foreach (var format in dts)
+                {
+                    if (DateTime.TryParseExact(
+                        arg, format, null,
+                        System.Globalization.DateTimeStyles.AssumeLocal|System.Globalization.DateTimeStyles.AllowWhiteSpaces|System.Globalization.DateTimeStyles.AdjustToUniversal,
+                        out var dateTime))
+                    {
+                        possibilities.Add(dateTime);
+                    }
+                }
+                
+                if (possibilities.Count() == 1)
+                {
+                    return possibilities.Single();
+                }
+                else if (possibilities.Any())
+                {
+                    var first = possibilities.First();
+                    if (possibilities.All(x => x.Equals(first)))
+                    {
+                        return first;
+                    }
+                    throw new InvalidOptionValue(longOption);
+                }
+                else
+                {
+                    throw new InvalidOptionValue(longOption);
+                }
             }
             catch (FormatException)
             {
