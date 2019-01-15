@@ -51,9 +51,9 @@ public static void Main(string[] args)
 
 Clux will interpret the following properties and fields as argument declarations:
 
-* all public, protected or private fields
-* and all properties that have an accessible getter and setter
-* excluding fields and properties that are decorated with an **[Ignore]** attribute.
+* all public, protected and private fields
+* plus all public, protected and private properties that have an accessible getter and setter
+* but excluding fields and properties that are decorated with an **[Ignore]** attribute.
 
 **_No distinction is made between properties and fields by Clux, and both are referred to as properties in the Clux documentation, for simplicity's sake._**
 
@@ -674,11 +674,13 @@ public class Args
 
 ```
 
-## A8. Parser Unions
+## A8. Parser Unions (Experimental)
 
 A Clux parser-union allows you to simultaneously attempt to parse multiple different argument sets, placing the burden of routing on Clux for the convenience of the developer.
 
 Clux will scan through the provided argument types, and invoke the appropriate handler.
+
+This is an experimental feature, which may be replaced with a different/better implementation method in the future.
 
 #### Example
 
@@ -781,4 +783,7 @@ Clux can provide you with the remainder when parsing fails, if you specifically 
 
 ## Error Handling
 
-**TODO**
+When a parser error occurs, the Clux library will throw a ParserException or derived exception.
+
+**TODO**: more documentation
+

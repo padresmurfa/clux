@@ -15,4 +15,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Clux\Clux.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Attributes\" />
+    <Folder Include="NamedOptions\" />
+    <Folder Include="Properties\" />
+    <Folder Include="Miscellaneous\" />
+  </ItemGroup>
 </Project>
