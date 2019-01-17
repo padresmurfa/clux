@@ -1,26 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System;
-using System.Collections;
-
-namespace Clux
+﻿namespace Clux
 {
-    public class UnknownOption : OptionException
+    public class UnknownOption<T> : OptionException<T> where T : new()
     {
-        public UnknownOption(char option)
-            : base(option)
+        public UnknownOption(TargetProperty<T> property)
+            : base(property)
         {
-        }
-
-        public UnknownOption(string option)
-            : base(option)
-        {
-        }
-
-        public override string ToString()
-        {
-            return $"UnknownOption, option={this.option}";
         }
     }
 }

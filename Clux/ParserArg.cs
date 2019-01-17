@@ -10,13 +10,13 @@ namespace Clux
     public partial class ParserArg<T>
         where T : new()
     {
-        string longOption;
+        TargetProperty<T> property;
         Type targetType;
         string arg;
         
-        public ParserArg(string longOption, Type targetType, string arg)
+        public ParserArg(TargetProperty<T> property, Type targetType, string arg)
         {
-            this.longOption = longOption;
+            this.property = property;
             this.targetType = targetType;
             this.arg = arg;
         }
@@ -38,7 +38,7 @@ namespace Clux
 
             var underlyingType = System.Enum.GetUnderlyingType(targetType);
 
-            var underlyingValue = new ParserArg<T>(longOption, underlyingType, arg).ParseArg();
+            var underlyingValue = new ParserArg<T>(property, underlyingType, arg).ParseArg();
 
             var valueType = underlyingValue.GetType();
 
@@ -66,7 +66,7 @@ namespace Clux
                     return true;
             }
             
-            throw new InvalidOptionValue(longOption);
+            throw new InvalidOptionValue<T>(property);
         }
         
         object ParseDateTime()
@@ -127,16 +127,16 @@ namespace Clux
                     {
                         return first;
                     }
-                    throw new InvalidOptionValue(longOption);
+                    throw new InvalidOptionValue<T>(property);
                 }
                 else
                 {
-                    throw new InvalidOptionValue(longOption);
+                    throw new InvalidOptionValue<T>(property);
                 }
             }
             catch (FormatException)
             {
-                throw new InvalidOptionValue(longOption);
+                throw new InvalidOptionValue<T>(property);
             }
         }
         
@@ -217,7 +217,7 @@ namespace Clux
                 {
                     if (arg.Length != 1)
                     {
-                        throw new InvalidOptionValue(longOption);
+                        throw new InvalidOptionValue<T>(property);
                     }
                     return arg.First();
                 }
@@ -231,7 +231,7 @@ namespace Clux
                 }
                 else
                 {
-                    throw new NotSupportedException("type " + targetType.FullName + " used by " + longOption + " has an unsupported base type");
+                    throw new NotSupportedException("type " + targetType.FullName + " used by " + this.property.Name + " has an unsupported base type");
                 }
             }
         }
@@ -251,15 +251,15 @@ namespace Clux
             }
             catch (FormatException)
             {
-                throw new InvalidOptionValue(longOption);
+                throw new InvalidOptionValue<T>(property);
             }
             catch (OverflowException)
             {
-                throw new InvalidOptionValue(longOption);
+                throw new InvalidOptionValue<T>(property);
             }
             catch (Exception)
             {
-               throw new InvalidOptionValue(longOption);
+               throw new InvalidOptionValue<T>(property);
             }
         }
     }

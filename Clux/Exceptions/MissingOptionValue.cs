@@ -1,14 +1,9 @@
 ﻿namespace Clux
 {
-    public class MissingOptionValue : OptionException
+    public class MissingOptionValue<T> : OptionException<T> where T : new()
     {
-        public MissingOptionValue(char option)
-            : base(option)
-        {
-        }
-
-        public MissingOptionValue(string option)
-            : base(option)
+        public MissingOptionValue(TargetProperty<T> property)
+            : base(property)
         {
         }
     }

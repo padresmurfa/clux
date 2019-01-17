@@ -27,7 +27,7 @@ namespace TestClux.Attributes
             {
                 Parser<OptionalConstStruct>.Parse(new []{ "-d" });
             }
-            catch (MissingConstantOption)
+            catch (MissingConstantOption<OptionalConstStruct>)
             {
                 Assert.False(true);
             }
@@ -37,7 +37,7 @@ namespace TestClux.Attributes
                 Parser<OptionalConstStruct>.Parse(new []{ "-c", "2", "-d" });
                 Assert.False(true);
             }
-            catch (MissingConstantOption)
+            catch (MissingConstantOption<OptionalConstStruct>)
             {
                 Parser<OptionalConstStruct>.Parse(new []{ "-c", "1", "-d" });
             }
@@ -61,7 +61,7 @@ namespace TestClux.Attributes
                 Parser<RequiredConstStruct>.Parse(new []{ "-d" });
                 Assert.False(true);
             }
-            catch (MissingConstantOption)
+            catch (MissingConstantOption<RequiredConstStruct>)
             {
             }
             
@@ -70,7 +70,7 @@ namespace TestClux.Attributes
                 Parser<RequiredConstStruct>.Parse(new []{ "-c", "2", "-d" });
                 Assert.False(true);
             }
-            catch (MissingConstantOption)
+            catch (MissingConstantOption<RequiredConstStruct>)
             {
                 Parser<RequiredConstStruct>.Parse(new []{ "-c", "1", "-d" });
             }

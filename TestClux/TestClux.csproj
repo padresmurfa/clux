@@ -20,5 +20,6 @@
     <Folder Include="NamedOptions\" />
     <Folder Include="Properties\" />
     <Folder Include="Miscellaneous\" />
+    <Folder Include="ErrorHandling\" />
   </ItemGroup>
 </Project>

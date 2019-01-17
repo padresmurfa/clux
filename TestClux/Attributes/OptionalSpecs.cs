@@ -44,7 +44,7 @@ namespace TestClux.Attributes
                 Parser<OptionalOverrideAndRequired>.Parse(new []{ "--conflicting", "1" });
                 Assert.False(true);
             }
-            catch (InvalidOptionDeclaration)
+            catch (InvalidOptionDeclaration<OptionalOverrideAndRequired>)
             {
             }
             

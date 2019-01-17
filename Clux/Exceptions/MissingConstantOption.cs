@@ -1,20 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System;
-using System.Collections;
-
-namespace Clux
+﻿namespace Clux
 {
-    public class MissingConstantOption : OptionException
+    public class MissingConstantOption<T> : OptionException<T> where T : new()
     {
-        public MissingConstantOption(char option)
-            : base(option)
-        {
-        }
-
-        public MissingConstantOption(string option)
-            : base(option)
+        public MissingConstantOption(TargetProperty<T> property)
+            : base(property)
         {
         }
     }

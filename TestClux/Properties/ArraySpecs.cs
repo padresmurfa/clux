@@ -98,7 +98,7 @@ namespace TestClux.Properties
                 parser.Parse(new[] { "--k-string", "a", "--k-string", "b" });
                 Assert.False(true);
             }
-            catch (DuplicateOption)
+            catch (DuplicateOption<Clopts>)
             {
             }
         }

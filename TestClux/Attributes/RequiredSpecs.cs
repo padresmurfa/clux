@@ -87,7 +87,7 @@ namespace TestClux.Attributes
                 Parser<Docker>.Parse(out var remainder, new string[0] );
                 Assert.False(true);
             }
-            catch (MissingRequiredOption)
+            catch (MissingRequiredOption<Docker>)
             {
                 var result = Parser<Docker>.Parse(out var remainder, new string[] { "verb" } );
                 Assert.Equal("verb", result.Verb);
@@ -127,7 +127,7 @@ namespace TestClux.Attributes
                 Parser<OptionalOverrideAndRequired>.Parse(new []{ "--conflicting", "1" });
                 Assert.False(true);
             }
-            catch (InvalidOptionDeclaration)
+            catch (InvalidOptionDeclaration<OptionalOverrideAndRequired>)
             {
             }
             
@@ -153,7 +153,7 @@ namespace TestClux.Attributes
                 });
                 Assert.False(true);
             }
-            catch (MissingRequiredOption)
+            catch (MissingRequiredOption<OptionalOverrideTests>)
             {
             }
             
@@ -165,7 +165,7 @@ namespace TestClux.Attributes
                 });
                 Assert.False(true);
             }
-            catch (MissingRequiredOption)
+            catch (MissingRequiredOption<OptionalOverrideTests>)
             {
             }
         }

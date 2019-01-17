@@ -1,14 +1,12 @@
-﻿namespace Clux
-{
-    public class AmbiguousOption : OptionException
-    {
-        public AmbiguousOption(char option)
-            : base(option)
-        {
-        }
+﻿using System.Linq;
+using System.Collections.Generic;
 
-        public AmbiguousOption(string option)
-            : base(option)
+namespace Clux
+{
+    public class AmbiguousOption<T> : OptionsException<T> where T : new()
+    {
+        public AmbiguousOption(IEnumerable<TargetProperty<T>> property)
+            : base(property)
         {
         }
     }

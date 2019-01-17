@@ -120,6 +120,17 @@ namespace Clux
         {
         }
 
+        public TargetProperty(string longOption)
+        {
+            this.Name = this.LongOption = ToKebabCase(longOption);
+        }
+        
+        public TargetProperty(char shortOption)
+        {
+            this.ShortOption = shortOption;
+            this.Name = shortOption.ToString();
+        }
+
         TargetProperty(string name, Attributes attributes, System.Type memberType, System.Type declaringType)
         {
             if (name == null)
@@ -162,7 +173,7 @@ namespace Clux
             
             if (isExplicitlyOptional && isExplicitlyRequired)
             {
-                throw new InvalidOptionDeclaration(this.LongOption);
+                throw new InvalidOptionDeclaration<T>(this);
             }
             
             if (isExplicitlyRequired)
@@ -266,7 +277,7 @@ namespace Clux
             {
                 if (!this.Constant.Equals(value))
                 {
-                    throw new MissingConstantOption(this.LongOption);
+                    throw new MissingConstantOption<T>(this);
                 }
             }
             

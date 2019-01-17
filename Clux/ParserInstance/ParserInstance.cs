@@ -178,7 +178,7 @@ namespace Clux
             var missing = this.All.FirstOrDefault(x => x.Required && !x.Touched);
             if (missing != null)
             {
-                throw new MissingRequiredOption(missing.LongOption);
+                throw new MissingRequiredOption<T>(missing);
             }
             
             return (T)target;
@@ -191,7 +191,7 @@ namespace Clux
             {
                 if (!constant.Touched)
                 {
-                    throw new MissingConstantOption(constant.LongOption);
+                    throw new MissingConstantOption<T>(constant);
                 }
             }
         }
@@ -234,13 +234,13 @@ namespace Clux
         {
             if (property.Touched)
             {
-                throw new DuplicateOption(property.LongOption);
+                throw new DuplicateOption<T>(property);
             }
 
             string sArg;
-            args = GetPositionalValue(property.Name, property.Position.HasValue, args, out sArg);
+            args = GetPositionalValue(property, property.Position.HasValue, args, out sArg);
 
-            var arg = new ParserArg<T>(property.LongOption, property.TargetType, sArg).ParseArg();
+            var arg = new ParserArg<T>(property, property.TargetType, sArg).ParseArg();
             property.SetValue(target, arg);
             
             return args;
@@ -255,15 +255,15 @@ namespace Clux
 
             if (property.Touched)
             {
-                throw new DuplicateOption(property.LongOption);
+                throw new DuplicateOption<T>(property);
             }
             
             if (property.Position.HasValue)
             {
                 string sArg;
-                args = GetPositionalValue(property.LongOption, property.Position.HasValue, args, out sArg);
+                args = GetPositionalValue(property, property.Position.HasValue, args, out sArg);
                 
-                var arg = new ParserArg<T>(property.LongOption, property.TargetType, sArg).ParseArg();
+                var arg = new ParserArg<T>(property, property.TargetType, sArg).ParseArg();
                 property.SetValue(target, arg);
             }
             else
@@ -292,7 +292,7 @@ namespace Clux
                     break;
                 }
 
-                var parsed = new ParserArg<T>(property.LongOption, elementType, arg).ParseArg();
+                var parsed = new ParserArg<T>(property, elementType, arg).ParseArg();
 
                 used.Add(parsed);
             }
@@ -392,7 +392,7 @@ namespace Clux
             return collection;
         }
         
-        List<string> GetPositionalValue(string propertyName, bool isPositional, List<string> args, out string val)
+        List<string> GetPositionalValue(TargetProperty<T> property, bool isPositional, List<string> args, out string val)
         {
             var sKey = args.First();
             args.RemoveAt(0);
@@ -413,7 +413,7 @@ namespace Clux
                 {
                     if (!args.Any())
                     {
-                        throw new MissingOptionValue(propertyName);
+                        throw new MissingOptionValue<T>(property);
                     }
 
                     val = args.First();

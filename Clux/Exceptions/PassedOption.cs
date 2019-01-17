@@ -1,14 +1,9 @@
 ﻿namespace Clux
 {
-    public class PassedOption : OptionException
+    public class PassedOption<T> : OptionException<T> where T : new()
     {
-        public PassedOption(char option)
-            : base(option)
-        {
-        }
-
-        public PassedOption(string option)
-            : base(option)
+        public PassedOption(TargetProperty<T> property)
+            : base(property)
         {
         }
     }

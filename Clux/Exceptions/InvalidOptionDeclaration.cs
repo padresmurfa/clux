@@ -1,14 +1,9 @@
 ﻿namespace Clux
 {
-    public class InvalidOptionDeclaration : OptionException
+    public class InvalidOptionDeclaration<T> : OptionException<T> where T : new()
     {
-        public InvalidOptionDeclaration(char option)
-            : base(option)
-        {
-        }
-
-        public InvalidOptionDeclaration(string option)
-            : base(option)
+        public InvalidOptionDeclaration(TargetProperty<T> property)
+            : base(property)
         {
         }
     }

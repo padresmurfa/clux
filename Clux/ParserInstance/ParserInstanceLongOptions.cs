@@ -40,12 +40,12 @@ namespace Clux
             {
                 if (option.Passed)
                 {
-                    throw new PassedOption(option.LongOption);
+                    throw new PassedOption<T>(option);
                 }
                 return true;
             }
             
-            throw new UnknownOption(key);
+            throw new UnknownOption<T>(new TargetProperty<T>(key));
         }
     }
 }

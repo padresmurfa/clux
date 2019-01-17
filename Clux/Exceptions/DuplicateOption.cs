@@ -1,14 +1,9 @@
 ﻿namespace Clux
 {
-    public class DuplicateOption : OptionException
+    public class DuplicateOption<T> : OptionException<T> where T : new()
     {
-        public DuplicateOption(char option)
-            : base(option)
-        {
-        }
-
-        public DuplicateOption(string option)
-            : base(option)
+        public DuplicateOption(TargetProperty<T> property)
+            : base(property)
         {
         }
     }

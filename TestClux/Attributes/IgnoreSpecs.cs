@@ -30,7 +30,7 @@ namespace TestClux.Attributes
                 parsed = Parser<IgnoreField>.Parse("--ignore-me", "ignore-me");
                 Assert.False(true);
             }
-            catch (UnknownOption)
+            catch (UnknownOption<IgnoreField>)
             {
             }
         }        

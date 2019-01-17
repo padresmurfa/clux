@@ -32,9 +32,9 @@ namespace Clux
                         tp.ShortOption = null;
                     }
                 }
-                else if (v.Any(x => x.IsShortOptionExplicit))
+                else if (v.Count(x => x.IsShortOptionExplicit) > 1)
                 {
-                    throw new AmbiguousOption(k);
+                    throw new AmbiguousOption<T>(all.Where(x => x.ShortOption == k));
                 }
                 else
                 {
@@ -70,13 +70,13 @@ namespace Clux
             {
                 if (option.Passed)
                 {
-                    throw new PassedOption(option.ShortOption.Value);
+                    throw new PassedOption<T>(option);
                 }
                 
                 return true;
             }
 
-            throw new UnknownOption(key);
+            throw new UnknownOption<T>(new TargetProperty<T>(key));
         }
         
         public List<string> SplitMergedShortOptions(List<string> current)

@@ -64,7 +64,7 @@ namespace TestClux.Properties
                 parsed = Parser<IgnoreROWO>.Parse("--ignore-me", "ignore-me");
                 Assert.False(true);
             }
-            catch (UnknownOption)
+            catch (UnknownOption<IgnoreROWO>)
             {
             }
             
@@ -73,7 +73,7 @@ namespace TestClux.Properties
                 parsed = Parser<IgnoreROWO>.Parse("--ignore-me-too", "ignore-me-too");
                 Assert.False(true);
             }
-            catch (UnknownOption)
+            catch (UnknownOption<IgnoreROWO>)
             {
             }
         }                

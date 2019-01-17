@@ -1,14 +1,9 @@
 ﻿namespace Clux
 {
-    public class InvalidOptionValue : OptionException
+    public class InvalidOptionValue<T> : OptionException<T> where T : new()
     {
-        public InvalidOptionValue(char option)
-            : base(option)
-        {
-        }
-
-        public InvalidOptionValue(string option)
-            : base(option)
+        public InvalidOptionValue(TargetProperty<T> property)
+            : base(property)
         {
         }
     }
