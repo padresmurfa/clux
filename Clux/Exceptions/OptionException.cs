@@ -29,12 +29,19 @@ namespace Clux
     public class OptionsException<T> : OptionException
         where T : new()
     {
+        public string[] Arguments { get; set; }
         public TargetProperty<T>[] Options { get; set; }
         
         public OptionsException(IEnumerable<TargetProperty<T>> options)
             : base(string.Join("+", options.Select(x => x.Name)))
         {
             this.Options = options.ToArray();
+        }
+        
+        public OptionsException(IEnumerable<string> optionNames)
+            : base(string.Join("+", optionNames))
+        {
+            this.Arguments = optionNames.ToArray();
         }
     }
 }

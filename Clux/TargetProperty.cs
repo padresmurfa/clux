@@ -281,6 +281,11 @@ namespace Clux
                 }
             }
             
+            if (Passed)
+            {
+                throw new PassedOption<T>(this);
+            }
+            
             var pi = typeof(T).GetProperty(Name);
             if (pi != null)
             {

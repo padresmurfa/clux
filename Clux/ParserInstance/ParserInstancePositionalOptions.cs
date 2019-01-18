@@ -29,7 +29,7 @@ namespace Clux
             return this.ByPosition.Count(p => p.Position.HasValue && position.HasValue && p.Position > position.Value);
         }
         
-        public TargetProperty<T> Get(int position, IEnumerable<TargetProperty<T>> all)
+        public TargetProperty<T> GetPositionalOption(int position, IEnumerable<TargetProperty<T>> all)
         {
             if (this.ByPosition.Count() <= position)
             {
@@ -42,13 +42,6 @@ namespace Clux
             {
                 throw new InvalidOperationException("Not sure how this happened...");
             }
-            
-            var passed = all.Where(o => o.Order <= po.Order);
-            foreach (var p in passed)
-            {
-                p.Passed = true;
-            }
-
             
             return po;
         }

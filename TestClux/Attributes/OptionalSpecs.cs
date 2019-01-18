@@ -19,13 +19,6 @@ namespace TestClux.Attributes
             [Clux.Optional]            
             public int? optionalNullable;
         }
-        
-        class OptionalOverrideAndRequired
-        {
-            [Required]
-            [Clux.Optional]
-            public int conflicting;
-        }
 
         [Fact]
         public void ShouldHaveOptionalAttributeThatIsInverseOfRequired()
@@ -37,16 +30,6 @@ namespace TestClux.Attributes
             });
             Assert.Equal(1, parsed.optionalNotNullable);
             Assert.Equal(2, parsed.optionalNullable);
-
-            // confliction option attributes
-            try
-            {
-                Parser<OptionalOverrideAndRequired>.Parse(new []{ "--conflicting", "1" });
-                Assert.False(true);
-            }
-            catch (InvalidOptionDeclaration<OptionalOverrideAndRequired>)
-            {
-            }
             
             parsed = Parser<OptionalOverrideTests>.Parse(new []{
                 //"--optional-not-nullable", "1",

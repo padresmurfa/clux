@@ -153,9 +153,20 @@ namespace Clux
                     }
                     else
                     {
-                        var positionalOption = this.ByPosition.Get(position++, this.All);
-
-                        current = ApplyOption(current, positionalOption);
+                        var positionalOption = this.ByPosition.GetPositionalOption(position++, this.All);
+                        try
+                        {
+                            current = ApplyOption(current, positionalOption);
+                        }
+                        finally
+                        {
+                            positionalOption.Passed = true;
+                            var passed = this.All.Where(o => o.Order < positionalOption.Order);
+                            foreach (var p in passed)
+                            {
+                                p.Passed = true;
+                            }
+                        }
                     }
                     
                     if (returnRemainder)
@@ -173,7 +184,14 @@ namespace Clux
                     throw;
                 }
             }
-            remainder = tmpRemainder;
+            if (returnRemainder)
+            {
+                remainder = tmpRemainder;
+            }
+            else if (current.Any())
+            {
+                throw new UnhandledArguments<T>(current);
+            }
 
             var missing = this.All.FirstOrDefault(x => x.Required && !x.Touched);
             if (missing != null)
@@ -227,10 +245,10 @@ namespace Clux
                 }
             }
             
-            return ApplyPositionalOption(args, property);
+            return ApplyPositionalOrNamedOption(args, property);
         }
 
-        private List<string> ApplyPositionalOption(List<string> args, TargetProperty<T> property)
+        private List<string> ApplyPositionalOrNamedOption(List<string> args, TargetProperty<T> property)
         {
             if (property.Touched)
             {
