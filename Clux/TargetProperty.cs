@@ -277,7 +277,7 @@ namespace Clux
             {
                 if (!this.Constant.Equals(value))
                 {
-                    throw new MissingConstantOption<T>(this);
+                    throw new IncorrectConstantOption<T>(this, value);
                 }
             }
             

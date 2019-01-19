@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>Clux</PackageId>
-    <PackageVersion>1.0.0.8</PackageVersion>
+    <PackageVersion>1.0.0.9</PackageVersion>
     <Authors>David Brandt</Authors>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseType>Unlicense</PackageLicenseType>
@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/padresmurfa/clux.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/padresmurfa/clux</PackageProjectUrl>
-    <PackageReleaseNotes>This version adds support and documentation for quite varied date/time formats.</PackageReleaseNotes>
+    <PackageReleaseNotes>This version improves error exceptions and fixes bugs in detecting enumeration values that are out of range and boolean false values sent via key=value syntax (e.g. --boolean=false)</PackageReleaseNotes>
     <Summary>A rich, yet developer friendly, C# command line user experience</Summary>
     <PackageTags>Command, Commandline, Command Line, Command Line Arguments, Parsing, Args, Arguments</PackageTags>
     <Title>Command-Line User Experience</Title>

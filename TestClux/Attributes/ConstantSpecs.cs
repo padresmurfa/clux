@@ -37,7 +37,7 @@ namespace TestClux.Attributes
                 Parser<OptionalConstStruct>.Parse(new []{ "-c", "2", "-d" });
                 Assert.False(true);
             }
-            catch (MissingConstantOption<OptionalConstStruct>)
+            catch (IncorrectConstantOption<OptionalConstStruct>)
             {
                 Parser<OptionalConstStruct>.Parse(new []{ "-c", "1", "-d" });
             }
@@ -70,7 +70,7 @@ namespace TestClux.Attributes
                 Parser<RequiredConstStruct>.Parse(new []{ "-c", "2", "-d" });
                 Assert.False(true);
             }
-            catch (MissingConstantOption<RequiredConstStruct>)
+            catch (IncorrectConstantOption<RequiredConstStruct>)
             {
                 Parser<RequiredConstStruct>.Parse(new []{ "-c", "1", "-d" });
             }
