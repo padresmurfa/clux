@@ -1,5 +1,4 @@
-﻿// MissingConstantOptionSpecs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Xunit;
 using System.Linq;
@@ -36,6 +35,7 @@ namespace TestClux.ErrorHandling
             try
             {
                 Parser<MissingConstantOptionArgs>.Parse("-b");
+                Assert.True(false);
             }
             catch (MissingConstantOption<MissingConstantOptionArgs> ex)
             {

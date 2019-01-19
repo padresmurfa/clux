@@ -34,6 +34,7 @@ namespace TestClux.ErrorHandling
             try
             {
                 Parser<IncorrectConstantOptionArgs>.Parse("-c", "43");
+                Assert.True(false);
             }
             catch (IncorrectConstantOption<IncorrectConstantOptionArgs> ex)
             {
@@ -48,6 +49,7 @@ namespace TestClux.ErrorHandling
             try
             {
                 Parser<IncorrectConstantOptionArgs>.Parse("-o", "43");
+                Assert.True(false);
             }
             catch (IncorrectConstantOption<IncorrectConstantOptionArgs> ex)
             {

@@ -432,10 +432,18 @@ namespace Clux
             }
             else
             {
-                var vi = sKey.IndexOfAny(new[] { '=' });
-                if (vi >= 0)
+                var eqIndex = sKey.IndexOfAny(new[] { '=' });
+                if (eqIndex >= 0)
                 {
-                    val = sKey.Substring(vi + 1);
+                    var valueIndex = eqIndex + 1;
+                    if (valueIndex == sKey.Length)
+                    {
+                        val = string.Empty;
+                    }
+                    else
+                    {
+                        val = sKey.Substring(valueIndex);
+                    }
                 }
                 else
                 {
