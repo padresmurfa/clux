@@ -7,7 +7,7 @@ using Clux;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace TestClux.Attributes
+namespace TestClux.ErrorHandling
 {
     public class InvalidOptionDeclarationSpecs
     {
@@ -27,8 +27,9 @@ namespace TestClux.Attributes
                 Parser<OptionalOverrideAndRequired>.Parse(new []{ "--conflicting", "1" });
                 Assert.False(true);
             }
-            catch (InvalidOptionDeclaration<OptionalOverrideAndRequired>)
+            catch (InvalidOptionDeclaration<OptionalOverrideAndRequired> ex)
             {
+                Assert.Equal("conflicting", ex.Option.Name);
             }
         }
      }

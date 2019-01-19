@@ -42,7 +42,17 @@ namespace Clux
 
             var valueType = underlyingValue.GetType();
 
-            return Enum.ToObject(targetType, (dynamic)underlyingValue);
+            var retval = Enum.ToObject(targetType, (dynamic)underlyingValue);
+            
+            foreach (var e in enumValues)
+            {
+                if (e.Equals(retval))
+                {
+                    return e;
+                }
+            }
+            
+            throw new InvalidOptionValue<T>(property, arg);
         }
 
         object ParseBool()
@@ -66,7 +76,7 @@ namespace Clux
                     return true;
             }
             
-            throw new InvalidOptionValue<T>(property);
+            throw new InvalidOptionValue<T>(property, arg);
         }
         
         object ParseDateTime()
@@ -127,16 +137,16 @@ namespace Clux
                     {
                         return first;
                     }
-                    throw new InvalidOptionValue<T>(property);
+                    throw new InvalidOptionValue<T>(property, arg);
                 }
                 else
                 {
-                    throw new InvalidOptionValue<T>(property);
+                    throw new InvalidOptionValue<T>(property, arg);
                 }
             }
             catch (FormatException)
             {
-                throw new InvalidOptionValue<T>(property);
+                throw new InvalidOptionValue<T>(property, arg);
             }
         }
         
@@ -217,7 +227,7 @@ namespace Clux
                 {
                     if (arg.Length != 1)
                     {
-                        throw new InvalidOptionValue<T>(property);
+                        throw new InvalidOptionValue<T>(property, arg);
                     }
                     return arg.First();
                 }
@@ -251,15 +261,15 @@ namespace Clux
             }
             catch (FormatException)
             {
-                throw new InvalidOptionValue<T>(property);
+                throw new InvalidOptionValue<T>(property, arg);
             }
             catch (OverflowException)
             {
-                throw new InvalidOptionValue<T>(property);
+                throw new InvalidOptionValue<T>(property, arg);
             }
             catch (Exception)
             {
-               throw new InvalidOptionValue<T>(property);
+               throw new InvalidOptionValue<T>(property, arg);
             }
         }
     }

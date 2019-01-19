@@ -2,9 +2,12 @@
 {
     public class InvalidOptionValue<T> : OptionException<T> where T : new()
     {
-        public InvalidOptionValue(TargetProperty<T> property)
+        public string Value { get; set;}
+        
+        public InvalidOptionValue(TargetProperty<T> property, string value)
             : base(property)
         {
+            this.Value = value;
         }
     }
 }

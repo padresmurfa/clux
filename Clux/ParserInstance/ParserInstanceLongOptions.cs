@@ -35,7 +35,8 @@ namespace Clux
                 return false;
             }
 
-            var key = arg.Substring(2).Split(new[] { '=', ':' }).First();
+            var split = arg.Substring(2).Split(new[] { '=', ':' });
+            var key = split.First();
             if (this.ByLongOption.TryGetValue(key, out option))
             {
                 if (option.Passed)

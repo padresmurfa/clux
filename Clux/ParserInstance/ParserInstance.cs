@@ -266,18 +266,13 @@ namespace Clux
 
         private List<string> ApplyBooleanOption(List<string> args, TargetProperty<T> property)
         {
-            if (!property.Position.HasValue)
-            {
-                args.RemoveAt(0);
-            }
-
-            if (property.Touched)
-            {
-                throw new DuplicateOption<T>(property);
-            }
-            
             if (property.Position.HasValue)
             {
+                if (property.Touched)
+                {
+                    throw new DuplicateOption<T>(property);
+                }
+                
                 string sArg;
                 args = GetPositionalValue(property, property.Position.HasValue, args, out sArg);
                 
@@ -286,7 +281,22 @@ namespace Clux
             }
             else
             {
-                property.SetValue(target, true);
+                var value = true;
+                var split = args[0].Substring(2).Split(new[] { '=', ':' });
+                if (split.Count() == 2)
+                {
+                    var last = split.Last();
+                    value = (bool)new ParserArg<T>(property, property.TargetType, last).ParseArg();
+                }
+            
+                args.RemoveAt(0);
+                
+                if (property.Touched)
+                {
+                    throw new DuplicateOption<T>(property);
+                }
+                
+                property.SetValue(target, value);
             }
             
             return args;

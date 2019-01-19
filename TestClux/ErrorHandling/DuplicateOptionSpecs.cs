@@ -7,7 +7,7 @@ using Clux;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace TestClux.NamedOptions
+namespace TestClux.ErrorHandling
 {
     public class DuplicateOptionSpecs
     {
