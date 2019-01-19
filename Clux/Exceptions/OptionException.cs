@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Clux
 {
-    public class OptionException : ParserException
+    public abstract class OptionException : ParserException
     { 
         public string OptionName { get; set;}
         
@@ -14,7 +14,7 @@ namespace Clux
         }
     }
     
-    public class OptionException<T> : OptionException
+    public abstract class OptionException<T> : OptionException
         where T : new()
     {
         public TargetProperty<T> Option { get; set;}
@@ -26,7 +26,7 @@ namespace Clux
         }
     }
     
-    public class OptionsException<T> : OptionException
+    public abstract class OptionsException<T> : OptionException
         where T : new()
     {
         public string[] Arguments { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace Clux
 {
-    public class ParserException : System.Exception
+    public abstract class ParserException : System.Exception
     {
         public ParserException(string message)
             : base(message)
