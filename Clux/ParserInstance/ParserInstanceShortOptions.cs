@@ -92,7 +92,24 @@ namespace Clux
 
         public bool AreMergedShortOptions(string arg)
         {
-            return this.IsShortOption(arg) && arg.Length > 2;
+            var couldBe = this.IsShortOption(arg) && arg.Length > 2;
+            if (couldBe)
+            {
+                var splitMerged = arg.Skip(1);
+                foreach (var option in splitMerged)
+                {
+                    if (!this.ByShortOption.ContainsKey(option))
+                    {
+                        throw new UnknownMergedShortOption<T>(arg.Substring(1), option);
+                    }
+                    else if (!typeof(bool?).IsAssignableFrom(this.ByShortOption[option].TargetType) && !typeof(bool).IsAssignableFrom(this.ByShortOption[option].TargetType))
+                    {
+                        throw new NonBoolMergedShortOption<T>(arg.Substring(1), option);
+                    }
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

@@ -120,19 +120,14 @@ namespace Clux
             
         T Parse(bool returnRemainder, out string[] remainder, params string[] args)
         {
+            var nextPositional = 0;
+            string[] tmpRemainder = args;
             remainder = null;
 
             Reset();
-            var position = 0;
 
             target = (object)new T();
             var current = args.ToList();
-            
-            string[] tmpRemainder = null;
-            if (returnRemainder)
-            {
-                tmpRemainder = current.ToArray();
-            }
 
             try
             {
@@ -153,7 +148,7 @@ namespace Clux
                     }
                     else
                     {
-                        var positionalOption = this.ByPosition.GetPositionalOption(position++);
+                        var positionalOption = this.ByPosition.GetPositionalOption(nextPositional++);
                         try
                         {
                             current = ApplyOption(current, positionalOption);
@@ -169,37 +164,48 @@ namespace Clux
                         }
                     }
                     
-                    if (returnRemainder)
-                    {
-                        tmpRemainder = current.ToArray();
-                    }
+                    tmpRemainder = current.ToArray();
                 }
                 
                 AssertConstants();
             }
-            catch (ParserException)
+            catch (ParserException ex)
             {
                 if (!returnRemainder)
                 {
+                    ex.NextPositional = nextPositional;
+                    ex.Remainder = tmpRemainder;
+                    ex.Input = args;
                     throw;
                 }
             }
-            if (returnRemainder)
-            {
-                remainder = tmpRemainder;
-            }
-            else if (current.Any())
-            {
-                throw new UnhandledArguments<T>(current);
-            }
-
-            var missing = this.All.FirstOrDefault(x => x.Required && !x.Touched);
-            if (missing != null)
-            {
-                throw new MissingRequiredOption<T>(missing);
-            }
             
-            return (T)target;
+            try
+            {
+                if (returnRemainder)
+                {
+                    remainder = tmpRemainder;
+                }
+                else if (current.Any())
+                {
+                    throw new UnhandledArguments<T>(current);
+                }
+    
+                var missing = this.All.FirstOrDefault(x => x.Required && !x.Touched);
+                if (missing != null)
+                {
+                    throw new MissingRequiredOption<T>(missing);
+                }
+                
+                return (T)target;
+            }
+            catch (ParserException ex)
+            {
+                ex.NextPositional = nextPositional;
+                ex.Remainder = tmpRemainder;
+                ex.Input = args;
+                throw;
+            }
         }
         
         void AssertConstants()
