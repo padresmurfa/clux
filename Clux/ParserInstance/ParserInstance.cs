@@ -229,7 +229,7 @@ namespace Clux
             
                 return ApplyCollectionOption(args, property, elementType, CreateOrAppendToArray);
             }
-            else if (typeof(bool).IsAssignableFrom(property.TargetType) || typeof(bool?).IsAssignableFrom(property.TargetType))
+            else if (property.IsBoolean)
             {
                 return ApplyBooleanOption(args, property);
             }

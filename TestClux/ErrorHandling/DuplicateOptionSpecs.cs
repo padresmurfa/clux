@@ -39,6 +39,7 @@ namespace TestClux.ErrorHandling
             catch (DuplicateOption<DuplicateOptionArgs> ex)
             {
                 Assert.Equal("Flag", ex.Option.Name);
+                Assert.Equal("Duplicate option encountered.  'Flag' may only occur once", ex.UserErrorMessage);
             }
         }
         
@@ -53,6 +54,7 @@ namespace TestClux.ErrorHandling
             catch (DuplicateOption<DuplicateOptionArgs> ex)
             {
                 Assert.Equal("Option", ex.Option.Name);
+                Assert.Equal("Duplicate option encountered.  'Option' may only occur once", ex.UserErrorMessage);
             }
         }
         
@@ -67,6 +69,7 @@ namespace TestClux.ErrorHandling
             catch (DuplicateOption<DuplicateOptionArgs> ex)
             {
                 Assert.Equal("Option", ex.Option.Name);
+                Assert.Equal("Duplicate option encountered.  'Option' may only occur once", ex.UserErrorMessage);
             }
         }
 
@@ -81,6 +84,7 @@ namespace TestClux.ErrorHandling
             catch (DuplicateOption<DuplicateOptionArgs> ex)
             {
                 Assert.Equal("Option", ex.Option.Name);
+                Assert.Equal("Duplicate option encountered.  'Option' may only occur once", ex.UserErrorMessage);
             }
         }
         
@@ -95,6 +99,7 @@ namespace TestClux.ErrorHandling
             catch (DuplicateOption<DuplicateOptionArgs> ex)
             {
                 Assert.Equal("Option", ex.Option.Name);
+                Assert.Equal("Duplicate option encountered.  'Option' may only occur once", ex.UserErrorMessage);
             }
         }
 

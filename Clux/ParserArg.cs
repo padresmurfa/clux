@@ -11,19 +11,31 @@ namespace Clux
         where T : new()
     {
         TargetProperty<T> property;
-        Type targetType;
+        Type testType;
         string arg;
         
-        public ParserArg(TargetProperty<T> property, Type targetType, string arg)
+        public ParserArg(TargetProperty<T> property, Type testType, string arg)
         {
             this.property = property;
-            this.targetType = targetType;
+            this.testType = testType;
             this.arg = arg;
+        }
+        
+        private Type UnderlyingTargetType
+        {
+            get
+            {
+                var underlyingNull = Nullable.GetUnderlyingType(testType);
+                
+                return underlyingNull ?? testType;
+            }
         }
         
         object ParseEnum()
         {
             var argLower = arg.ToLowerInvariant();
+            
+            var targetType = UnderlyingTargetType;
 
             // TODO: enums may also be stated by value
             var enumValues = System.Enum.GetValues(targetType);
@@ -152,6 +164,8 @@ namespace Clux
         
         bool ParseNumeric(out object number)
         {
+            var targetType = UnderlyingTargetType;
+            
             if (typeof(sbyte).IsAssignableFrom(targetType))
             {
                 number = s2n<sbyte>();
@@ -206,8 +220,7 @@ namespace Clux
         
         public object ParseArg()
         {
-            var underlyingNull = Nullable.GetUnderlyingType(targetType);
-            targetType = underlyingNull ?? targetType;
+            var targetType = UnderlyingTargetType;
 
             if (targetType.IsEnum)
             {

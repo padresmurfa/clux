@@ -44,6 +44,127 @@ namespace Clux
         public bool Ignore { get; set; }
         public bool IsShortOptionExplicit { get; set; }
         
+        public bool IsBoolean
+        {
+            get
+            {
+               return Is(typeof(bool));
+            }
+        }
+        
+        public bool IsDateTime
+        {
+            get
+            {
+                return Is(typeof(DateTime));
+            }
+        }
+        
+        public bool IsSignedInteger
+        {
+            get
+            {
+                var signedTypes = new []{
+                    typeof(Int64), typeof(Int32), typeof(Int16), typeof(SByte)
+                };
+                
+                return signedTypes.Any(x => Is(x));
+            }
+        }
+        
+        public bool IsUnsignedInteger
+        {
+            get
+            {
+                var unsignedTypes = new []{
+                    typeof(UInt64), typeof(UInt32), typeof(UInt16), typeof(Byte)
+                };
+                
+                return unsignedTypes.Any(x => Is(x));
+            }
+        }
+        
+        private static readonly Type[] integerTypes = new []{
+            typeof(SByte), typeof(Byte),
+            typeof(Int16), typeof(UInt16),
+            typeof(Int32), typeof(UInt32),
+            typeof(Int64), typeof(UInt64)
+        };
+        private static readonly int[] bits = new []{ 8, 8, 16, 16, 32, 32, 64, 64 };
+        
+        public int IntegerBits
+        {
+            get
+            {
+                
+                for (var i = 0; i < integerTypes.Length; ++i)
+                {
+                    var t = integerTypes[i];
+                    if (Is(t))
+                    {
+                        return bits[i];
+                    }
+                }
+                
+                throw new NotSupportedException();
+            }
+        }
+        
+        public bool IsInteger
+        {
+            get
+            {
+                return IsSignedInteger || IsUnsignedInteger;
+            }
+        }
+        
+        public bool IsEnum
+        {
+            get
+            {
+                if (TargetType.IsEnum)
+                {
+                    return true;
+                }
+                var underlyingType = Nullable.GetUnderlyingType(TargetType);
+                var isNullableType = null != underlyingType;
+                if (isNullableType)
+                {
+                    return underlyingType.IsEnum;
+                }
+                return false;
+            }
+        }
+        
+        public bool IsChar
+        {
+            get { return Is(typeof(char)); }
+        }
+        
+        public bool IsString
+        {
+            get { return Is(typeof(string)); }
+        }
+
+        private bool Is(Type check)
+        {
+            var isIndeed = check.IsAssignableFrom(TargetType);
+            if (isIndeed)
+            {
+                return true;
+            }
+            else
+            {
+                var underlyingType = Nullable.GetUnderlyingType(TargetType);
+                var isNullableType = null != underlyingType;
+                if (isNullableType)
+                {
+                    return check.IsAssignableFrom(underlyingType);
+                }
+            }
+            return false;
+        }
+        
         class Attributes
         {
             public UsageAttribute Usage;
@@ -270,6 +391,15 @@ namespace Clux
                 }
             }
         }
+        
+        public char ShortOptionOrDefault
+        {
+            get
+            {
+                return this.ShortOption ?? char.ToLowerInvariant(this.Name.First());
+            }
+        }
+        
 
         public void SetValue(object instance, object value)
         {

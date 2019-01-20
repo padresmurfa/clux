@@ -7,6 +7,7 @@ namespace Clux
         where T : new()
     {
         Dictionary<char, TargetProperty<T>> ByShortOption;
+        Dictionary<char, TargetProperty<T>[]> AmbiguousOptions = new Dictionary<char, TargetProperty<T>[]>();
         
         public ParserInstanceShortOptions(List<TargetProperty<T>> all)
         {
@@ -34,11 +35,13 @@ namespace Clux
                 }
                 else if (v.Count(x => x.IsShortOptionExplicit) > 1)
                 {
-                    throw new AmbiguousOption<T>(all.Where(x => x.ShortOption == k));
+                    throw new AmbiguousOption<T>(all.Where(x => x.ShortOption == k), isDeclaration: true);
                 }
                 else
                 {
-                    // else, wasn't asked for, just skip it
+                    // else, wasn't asked for, just skip it, but mark the option as
+                    // ambiguous so that we can provide proper help
+                    this.AmbiguousOptions[k] = v.ToArray();
                     foreach (var tp in v)
                     {
                         tp.ShortOption = null;
@@ -75,8 +78,15 @@ namespace Clux
                 
                 return true;
             }
-
-            throw new UnknownOption<T>(new TargetProperty<T>(key));
+            
+            if (this.AmbiguousOptions.TryGetValue(key, out var ambiguousOptions))
+            {
+                throw new AmbiguousOption<T>(ambiguousOptions);
+            }
+            else
+            {
+                throw new UnknownOption<T>(new TargetProperty<T>(key));
+            }
         }
         
         public List<string> SplitMergedShortOptions(List<string> current)
@@ -102,7 +112,7 @@ namespace Clux
                     {
                         throw new UnknownMergedShortOption<T>(arg.Substring(1), option);
                     }
-                    else if (!typeof(bool?).IsAssignableFrom(this.ByShortOption[option].TargetType) && !typeof(bool).IsAssignableFrom(this.ByShortOption[option].TargetType))
+                    else if (!this.ByShortOption[option].IsBoolean)
                     {
                         throw new NonBoolMergedShortOption<T>(arg.Substring(1), option);
                     }

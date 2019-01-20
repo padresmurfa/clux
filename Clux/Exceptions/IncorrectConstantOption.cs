@@ -8,6 +8,8 @@
             : base(property)
         {
             this.IncorrectValue = incorrectValue;
+            
+            this.UserErrorMessage = $"Incorrect constant value. '{property.Name}' must have the value '{property.Constant}', but had the value '{incorrectValue}'";
         }
     }
 }

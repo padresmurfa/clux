@@ -21,7 +21,7 @@ namespace TestClux.ErrorHandling
         }
 
         [Fact]
-        public void RejectsExplicitAmbiguousOptions()
+        public void RejectsExplicitAmbiguousOptionDeclarations()
         {
             try
             {
@@ -33,6 +33,8 @@ namespace TestClux.ErrorHandling
                 Assert.Equal( 2, o.Options.Count() );
                 Assert.True( o.Options.Any(x => x.Name == "Argument") );
                 Assert.True( o.Options.Any(x => x.Name == "Argh") );
+                
+                Assert.Equal("Ambiguous argument declaration. '-a' could refer to any of the following: 'Argh' or 'Argument'", o.UserErrorMessage);
             }
         }
         
@@ -51,8 +53,9 @@ namespace TestClux.ErrorHandling
                 Parser<IgnoredShortOption>.Parse(new[] { "-a" });
                 Assert.True(false);
             }
-            catch (UnknownOption<IgnoredShortOption> o)
+            catch (AmbiguousOption<IgnoredShortOption> o)
             {
+                Assert.Equal("Ambiguous argument. '-a' could refer to any of the following: 'Argh' or 'Argument'", o.UserErrorMessage);
             }
         }
         

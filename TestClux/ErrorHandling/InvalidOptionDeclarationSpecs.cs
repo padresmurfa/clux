@@ -30,6 +30,8 @@ namespace TestClux.ErrorHandling
             catch (InvalidOptionDeclaration<OptionalOverrideAndRequired> ex)
             {
                 Assert.Equal("conflicting", ex.Option.Name);
+                
+                Assert.Equal("Conflicting option declaration. 'conflicting' was explicitly declared to be both Optional and Required", ex.UserErrorMessage);
             }
         }
      }

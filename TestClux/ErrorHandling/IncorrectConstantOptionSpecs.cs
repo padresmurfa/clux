@@ -40,6 +40,7 @@ namespace TestClux.ErrorHandling
             {
                 Assert.Equal("Constant", ex.Option.Name);
                 Assert.Equal(43, ex.IncorrectValue);
+                Assert.Equal("Incorrect constant value. 'Constant' must have the value '42', but had the value '43'", ex.UserErrorMessage);
             }
         }
         
@@ -55,6 +56,7 @@ namespace TestClux.ErrorHandling
             {
                 Assert.Equal("OptionalConstant", ex.Option.Name);
                 Assert.Equal(43, ex.IncorrectValue);
+                Assert.Equal("Incorrect constant value. 'OptionalConstant' must have the value '42', but had the value '43'", ex.UserErrorMessage);
             }
         }
     }
