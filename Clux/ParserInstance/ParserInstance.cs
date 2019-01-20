@@ -153,7 +153,7 @@ namespace Clux
                     }
                     else
                     {
-                        var positionalOption = this.ByPosition.GetPositionalOption(position++, this.All);
+                        var positionalOption = this.ByPosition.GetPositionalOption(position++);
                         try
                         {
                             current = ApplyOption(current, positionalOption);

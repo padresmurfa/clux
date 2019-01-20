@@ -1,9 +1,9 @@
 ﻿namespace Clux
 {
-    public class UnexpectedPositionalOption : ParserException
+    public class UnexpectedPositionalOption<T> : OptionException where T : new()
     {
         public UnexpectedPositionalOption(int position)
-            : base($"Unknown positional option: ${position}")
+            : base($"#${position}")
         {
         }
     }

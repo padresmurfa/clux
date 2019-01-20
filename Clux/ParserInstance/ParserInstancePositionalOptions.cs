@@ -29,11 +29,11 @@ namespace Clux
             return this.ByPosition.Count(p => p.Position.HasValue && position.HasValue && p.Position > position.Value);
         }
         
-        public TargetProperty<T> GetPositionalOption(int position, IEnumerable<TargetProperty<T>> all)
+        public TargetProperty<T> GetPositionalOption(int position)
         {
             if (this.ByPosition.Count() <= position)
             {
-                throw new UnexpectedPositionalOption(position);
+                throw new UnexpectedPositionalOption<T>(position);
             }
 
             var po = this.ByPosition[position];
