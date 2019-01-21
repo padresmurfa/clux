@@ -17,7 +17,7 @@ namespace SampleApp
     
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             SampleArgs parsed;
             
@@ -28,13 +28,14 @@ namespace SampleApp
             }
             catch (ParserException ex)
             {
-                Console.WriteLine($"[ERROR] {ex.Message}");
+                Console.WriteLine($"ERROR: {ex.UserErrorMessage}");
                 DisplayHelp();
-                return;
+                return -1;
             }
             
             if (parsed.Help ?? false)
             {
+                Console.WriteLine("SampleApp Help:");
                 DisplayHelp();
             }
             else
@@ -42,12 +43,12 @@ namespace SampleApp
                 Console.WriteLine($"Quote of the day: {parsed.Quote}");
             }
             Console.WriteLine();
+            return 0;
         }
 
         private static void DisplayHelp()
         {
-            Console.WriteLine("SampleApp Help:");
-            Console.WriteLine("--------------------");
+            Console.WriteLine("----------------------------------------");
             var lines = Parser<SampleArgs>.GetHelpMessage("sampleapp").Split("\n");
             foreach (var line in lines)
             {

@@ -758,7 +758,7 @@ This is an experimental feature, which may be replaced with a different/better i
 
 Clux can provide you with the remainder when parsing fails, if you specifically request it.
 
-```
+```C#
 
         public class Foo
         {
@@ -774,7 +774,7 @@ Clux can provide you with the remainder when parsing fails, if you specifically 
             Parser<Docker>.Parse(out remainder, new string[0] );
             Assert.False(true);
         }
-        catch (MissingRequiredOption)
+        catch (MissingRequiredOption<Docker>)
         {
             var result = Parser<Docker>.Parse(out remainder, new string[] { "verb" } );
             Assert.Equal("verb", result.Verb);
@@ -783,7 +783,37 @@ Clux can provide you with the remainder when parsing fails, if you specifically 
 
 ## Error Handling
 
-When a parser error occurs, the Clux library will throw a ParserException or derived exception.
+When a parser error occurs, the Clux library will throw a ParserException-derived exception.
 
-**TODO**: more documentation
+The most appropriate response for the host application would be to output the exception's error message, followed by the usage help message.
 
+#### Example:
+
+```C#
+     static int Main(string[] args)
+    {
+            var parser = Parser<ProgramArgs>.Create();
+            try
+            {
+                parsed = parser.Parse(args);
+            }
+            catch (ParserException ex)
+            {
+                Console.WriteLine($"ERROR: {ex.UserErrorMessage}");
+
+                Console.WriteLine("----------------------------------------");
+
+                var lines = Parser<SampleArgs>.GetHelpMessage("sampleapp").Split("\n");
+                foreach (var line in lines)
+                {
+                    Console.WriteLine(line);
+                }
+
+                return -1;
+            }
+
+            Console.WriteLine($"Parsed '{args}' successfully");
+            
+            return 0;
+        }
+```
