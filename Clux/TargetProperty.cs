@@ -84,6 +84,42 @@ namespace Clux
             }
         }
         
+        public bool IsFloatingPoint
+        {
+            get
+            {
+                var floatingPointTypes = new []{
+                    typeof(float), typeof(double), typeof(decimal)
+                };
+                
+                return floatingPointTypes.Any(x => Is(x));
+            }
+        }
+        
+        public bool IsSinglePrecisionFloatingPoint
+        {
+            get
+            {
+                return Is(typeof(float));
+            }
+        }
+        
+        public bool IsDoublePrecisionFloatingPoint
+        {
+            get
+            {
+                return Is(typeof(double));
+            }
+        }
+        
+        public bool IsDecimalFloatingPoint
+        {
+            get
+            {
+                return Is(typeof(decimal));
+            }
+        }
+        
         private static readonly Type[] integerTypes = new []{
             typeof(SByte), typeof(Byte),
             typeof(Int16), typeof(UInt16),

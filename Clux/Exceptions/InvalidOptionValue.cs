@@ -54,6 +54,19 @@ namespace Clux
                 
                 this.UserErrorMessage = $"Invalid value. '{property.Name}' cannot accept the value '{invalidValue}'.  It can only accept values from the following list: {allowed}";
             }
+            else if (property.IsFloatingPoint)
+            {
+                var floatingPointType = "decimal ";
+                if (property.IsSinglePrecisionFloatingPoint)
+                {
+                    floatingPointType = "single-precision ";
+                }
+                else if (property.IsDoublePrecisionFloatingPoint)
+                {
+                    floatingPointType = "double-precision ";
+                }
+                this.UserErrorMessage = $"Invalid number. '{property.Name}' cannot accept the value '{invalidValue}'.  It can only accept valid {floatingPointType}floating point or integral numbers (optionally specified in base 2, 8, or 16).  See https://github.com/padresmurfa/clux for more details";
+            }
         }
     }
 }

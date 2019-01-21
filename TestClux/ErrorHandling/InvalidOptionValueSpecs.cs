@@ -51,6 +51,15 @@ namespace TestClux.ErrorHandling
             
             [Clux.Optional]
             public Bla Enum;
+            
+            [Clux.Optional]
+            public float Float;
+            
+            [Clux.Optional]
+            public double Double;
+            
+            [Clux.Optional]
+            public decimal Decimal;
         }
 
         [Fact]
@@ -132,7 +141,7 @@ namespace TestClux.ErrorHandling
             }
         }
         
-        public static IEnumerable<object[]> InvalidNumberValues
+        public static IEnumerable<object[]> InvalidIntegerValues
         {
             get
             {
@@ -172,8 +181,8 @@ namespace TestClux.ErrorHandling
         }
         
         [Theory]
-        [MemberData(nameof(InvalidNumberValues))]
-        public void DetectsInvalidNumberValues(string argName, string argValue, string member, string allowed)
+        [MemberData(nameof(InvalidIntegerValues))]
+        public void DetectsInvalidIntegerValues(string argName, string argValue, string member, string allowed)
         {
             try
             {
@@ -208,10 +217,37 @@ namespace TestClux.ErrorHandling
             }     
         }
         
-        [Fact]
-        public void DetectsInvalidFractionalValues()
+        public static IEnumerable<object[]> InvalidFractionalValues
         {
-            throw new NotImplementedException();
+            get
+            {
+                return new List<object[]>
+                {
+                    // TODO: various invalid forms
+                    new object[] { "--decimal", "1" + (Decimal.MaxValue).ToString(), "Decimal", "decimal floating point or integral numbers (optionally specified in base 2, 8, or 16)" },
+                    new object[] { "--float", "1" + (float.MaxValue).ToString(), "Float", "single-precision floating point or integral numbers (optionally specified in base 2, 8, or 16)" },
+                    new object[] { "--double", "1" + (double.MaxValue).ToString(), "Double", "double-precision floating point or integral numbers (optionally specified in base 2, 8, or 16)" },
+
+                };
+            }
+        }
+        
+        [Theory]
+        [MemberData(nameof(InvalidFractionalValues))]
+        public void DetectsInvalidFractionalValues(string argName, string argValue, string member, string allowed)
+        {
+            try
+            {
+                var parsed = Parser<InvalidOptionArgs>.Parse(new[] { argName, argValue });
+                Assert.True(false);
+            }
+            catch (InvalidOptionValue<InvalidOptionArgs> ex)
+            {
+                Assert.Equal(member, ex.Option.Name);
+                Assert.Equal(argValue, ex.InvalidValue);
+                
+                Assert.Equal($"Invalid number. '{ex.OptionName}' cannot accept the value '{ex.InvalidValue}'.  It can only accept valid {allowed}.  See https://github.com/padresmurfa/clux for more details", ex.UserErrorMessage);
+            }     
         }
     }
 }
