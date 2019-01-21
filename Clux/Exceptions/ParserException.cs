@@ -10,6 +10,7 @@
         public ParserException(string message)
             : base(message)
         {
+            this.UserErrorMessage = $"Failed to parse command line arguments: {message}";
         }
     }
 }

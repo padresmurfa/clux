@@ -5,6 +5,7 @@
         public MissingRequiredOption(TargetProperty<T> property)
             : base(property)
         {
+            this.UserErrorMessage = $"{property.Name}' is a required option, but it was not provided";
         }
     }
 }

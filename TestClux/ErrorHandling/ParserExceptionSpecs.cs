@@ -30,8 +30,9 @@ namespace TestClux.ErrorHandling
                 Parser<ParserExceptionArgs>.Parse("--not-an-option");
                 Assert.True(false);                
             }
-            catch (ParserException)
+            catch (ParserException ex)
             {
+                Assert.False(string.IsNullOrEmpty(ex.UserErrorMessage));
             }
         }
         
@@ -50,6 +51,7 @@ namespace TestClux.ErrorHandling
                 Assert.Equal("first", ex.Input[1]);
                 Assert.Equal("second", ex.Input[2]);
                 Assert.Equal("third", ex.Input[3]);
+                Assert.False(string.IsNullOrEmpty(ex.UserErrorMessage));
             }
         }
         
@@ -64,6 +66,7 @@ namespace TestClux.ErrorHandling
             catch (ParserException ex)
             {
                 Assert.Equal(0, ex.NextPositional);
+                Assert.False(string.IsNullOrEmpty(ex.UserErrorMessage));
             }
         
             try
@@ -74,6 +77,7 @@ namespace TestClux.ErrorHandling
             catch (ParserException ex)
             {
                 Assert.Equal(1, ex.NextPositional);
+                Assert.False(string.IsNullOrEmpty(ex.UserErrorMessage));
             }
             
             try
@@ -84,6 +88,7 @@ namespace TestClux.ErrorHandling
             catch (ParserException ex)
             {
                 Assert.Equal(2, ex.NextPositional);
+                Assert.False(string.IsNullOrEmpty(ex.UserErrorMessage));
             }
         }
         
@@ -99,6 +104,7 @@ namespace TestClux.ErrorHandling
             {
                 Assert.Equal(1, ex.Remainder.Length);
                 Assert.Equal("--not-an-option", ex.Remainder[0]);
+                Assert.False(string.IsNullOrEmpty(ex.UserErrorMessage));
             }
         
             try
@@ -110,6 +116,7 @@ namespace TestClux.ErrorHandling
             {
                 Assert.Equal(1, ex.Remainder.Length);
                 Assert.Equal("--not-an-option", ex.Remainder[0]);
+                Assert.False(string.IsNullOrEmpty(ex.UserErrorMessage));
             }
         }
         
@@ -129,6 +136,8 @@ namespace TestClux.ErrorHandling
                 // ok, this is somewhat weird
                 Assert.Equal(1, ex.Remainder.Length);
                 Assert.Equal("-not", ex.Remainder[0]);
+                
+                Assert.False(string.IsNullOrEmpty(ex.UserErrorMessage));
             }
         }
         
@@ -152,6 +161,9 @@ namespace TestClux.ErrorHandling
                 Assert.Equal("-no", ex.Remainder[0]);
                 Assert.Equal("-thi", ex.Remainder[1]);
                 Assert.Equal("-ng", ex.Remainder[2]);
+                
+                Assert.False(string.IsNullOrEmpty(ex.UserErrorMessage));
             }
-        }    }
+        }
+    }
 }

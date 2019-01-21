@@ -32,6 +32,7 @@ namespace TestClux.ErrorHandling
             catch (UnhandledArguments<UnhandledArgumentsArgs> ex)
             {
                 Assert.Equal("-p", ex.Arguments.Single());
+                Assert.Equal($"Too many arguments, or arguments out of order.  Failed to interpret: '-p'", ex.UserErrorMessage);
             }
         }
         

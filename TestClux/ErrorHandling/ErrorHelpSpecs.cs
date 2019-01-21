@@ -33,11 +33,5 @@ namespace TestClux.ErrorHandling
                 Assert.False(string.IsNullOrEmpty(o.UserErrorMessage));
             }
         }
-        
-        [Fact]
-        public void ProvidesHelpMessageFromAllParserExceptions()
-        {
-            throw new NotImplementedException(); 
-        }
     }
 }

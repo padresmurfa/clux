@@ -42,6 +42,7 @@ namespace TestClux.ErrorHandling
             catch (MissingOptionValue<MissingOptionValueArgs> ex)
             {
                 Assert.Equal("LongString", ex.Option.Name);
+                Assert.Equal("Missing option value. 'LongString' must be provided with a value", ex.UserErrorMessage);
             }
         }
     }

@@ -33,14 +33,14 @@ namespace Clux
         {
             if (this.ByPosition.Count() <= position)
             {
-                throw new UnexpectedPositionalOption<T>(position);
+                throw new ArgumentException($"Internal Error: position({position}) > byPosition.Count", nameof(position));
             }
 
             var po = this.ByPosition[position];
             
             if (po.Passed)
             {
-                throw new InvalidOperationException("Not sure how this happened...");
+                throw new ArgumentException($"Internal Error: passed position({position}) already", nameof(position));
             }
             
             return po;

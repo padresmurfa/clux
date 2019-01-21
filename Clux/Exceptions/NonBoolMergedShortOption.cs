@@ -8,6 +8,7 @@
             : base(option.ToString())
         {
             this.UnmergedOption = arg;
+            this.UserErrorMessage = $"'-{arg}' contains the non-boolean option '{option}', which requires a value and cannot be merged with other short options";
         }
     }
 }

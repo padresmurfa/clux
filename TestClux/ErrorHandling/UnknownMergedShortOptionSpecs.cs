@@ -39,6 +39,8 @@ namespace TestClux.ErrorHandling
                 Assert.Equal("-otn", ex.Remainder.First());
                 Assert.Equal("otn", ex.UnmergedOption);
                 Assert.Equal("n", ex.OptionName);
+                
+                Assert.Equal("Unknown short option '-n'.  Could not separate short options from '-otn'", ex.UserErrorMessage);
             }
         }
     }

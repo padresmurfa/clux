@@ -30,9 +30,10 @@ namespace TestClux.ErrorHandling
                 Parser<UnknownOptionArgs>.Parse("--unknown-option", "uko");
                 Assert.True(false);
             }
-            catch (UnknownOption<UnknownOptionArgs> ex)
+            catch (UnknownLongOption<UnknownOptionArgs> ex)
             {
                 Assert.Equal("unknown-option", ex.OptionName);
+                Assert.Equal("Unknown long option: '--unknown-option'", ex.UserErrorMessage);
             }
         }
         
@@ -44,9 +45,10 @@ namespace TestClux.ErrorHandling
                 Parser<UnknownOptionArgs>.Parse("-u", "uko");
                 Assert.True(false);
             }
-            catch (UnknownOption<UnknownOptionArgs> ex)
+            catch (UnknownShortOption<UnknownOptionArgs> ex)
             {
                 Assert.Equal("u", ex.OptionName);
+                Assert.Equal("Unknown short option: '-u'", ex.UserErrorMessage);
             }
         }
     }

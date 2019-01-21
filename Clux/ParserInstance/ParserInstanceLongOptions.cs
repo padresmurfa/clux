@@ -46,7 +46,7 @@ namespace Clux
                 return true;
             }
             
-            throw new UnknownOption<T>(new TargetProperty<T>(key));
+            throw new UnknownLongOption<T>(new TargetProperty<T>(key));
         }
     }
 }

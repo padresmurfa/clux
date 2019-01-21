@@ -40,6 +40,7 @@ namespace TestClux.ErrorHandling
             catch (MissingConstantOption<MissingConstantOptionArgs> ex)
             {
                 Assert.Equal("Constant", ex.Option.Name);
+                Assert.Equal("Missing constant value. 'Constant' must have the value '42'", ex.UserErrorMessage);
             }
         }
         

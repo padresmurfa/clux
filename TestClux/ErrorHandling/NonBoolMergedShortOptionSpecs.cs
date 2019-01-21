@@ -42,6 +42,7 @@ namespace TestClux.ErrorHandling
                 Assert.Equal("-oa", ex.Remainder.First());
                 Assert.Equal("oa", ex.UnmergedOption);
                 Assert.Equal("a", ex.OptionName);
+                Assert.Equal("'-oa' contains the non-boolean option 'a', which requires a value and cannot be merged with other short options", ex.UserErrorMessage);
             }
         }
         
@@ -59,6 +60,7 @@ namespace TestClux.ErrorHandling
                 Assert.Equal("-ab", ex.Remainder.First());
                 Assert.Equal("ab", ex.UnmergedOption);
                 Assert.Equal("a", ex.OptionName);
+                Assert.Equal("'-ab' contains the non-boolean option 'a', which requires a value and cannot be merged with other short options", ex.UserErrorMessage);
             }
         }
     }

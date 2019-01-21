@@ -8,6 +8,8 @@
             : base(option.ToString())
         {
             this.UnmergedOption = arg;
+            
+            this.UserErrorMessage = $"Unknown short option '-{option}'.  Could not separate short options from '-{arg}'";
         }
     }
 }

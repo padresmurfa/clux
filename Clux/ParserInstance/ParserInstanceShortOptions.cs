@@ -85,7 +85,7 @@ namespace Clux
             }
             else
             {
-                throw new UnknownOption<T>(new TargetProperty<T>(key));
+                throw new UnknownShortOption<T>(new TargetProperty<T>(key));
             }
         }
         

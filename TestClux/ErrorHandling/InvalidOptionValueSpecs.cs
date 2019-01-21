@@ -217,13 +217,12 @@ namespace TestClux.ErrorHandling
             }     
         }
         
-        public static IEnumerable<object[]> InvalidFractionalValues
+        public static IEnumerable<object[]> InvalidFloatingPointValues
         {
             get
             {
                 return new List<object[]>
                 {
-                    // TODO: various invalid forms
                     new object[] { "--decimal", "1" + (Decimal.MaxValue).ToString(), "Decimal", "decimal floating point or integral numbers (optionally specified in base 2, 8, or 16)" },
                     new object[] { "--float", "1" + (float.MaxValue).ToString(), "Float", "single-precision floating point or integral numbers (optionally specified in base 2, 8, or 16)" },
                     new object[] { "--double", "1" + (double.MaxValue).ToString(), "Double", "double-precision floating point or integral numbers (optionally specified in base 2, 8, or 16)" },
@@ -233,8 +232,8 @@ namespace TestClux.ErrorHandling
         }
         
         [Theory]
-        [MemberData(nameof(InvalidFractionalValues))]
-        public void DetectsInvalidFractionalValues(string argName, string argValue, string member, string allowed)
+        [MemberData(nameof(InvalidFloatingPointValues))]
+        public void DetectsInvalidFloatingPointValues(string argName, string argValue, string member, string allowed)
         {
             try
             {

@@ -36,6 +36,7 @@ namespace TestClux.ErrorHandling
             catch (MissingRequiredOption<MissingRequiredOptionArgs> ex)
             {
                 Assert.Equal("Required", ex.Option.Name);
+                Assert.Equal("Required' is a required option, but it was not provided", ex.UserErrorMessage);
             }
         }
     }
