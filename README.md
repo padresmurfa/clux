@@ -439,6 +439,43 @@ usage: docker-run [-drit] [--add-host <str>] [-a (stdin|stdout|stderr)] [-b <n>]
 */
 ```        
 
+## Error Handling
+
+When a parser error occurs, the Clux library will throw a ParserException-derived exception.
+
+The most appropriate response for the host application would be to output the exception's error message, followed by the usage help message.
+
+#### Example:
+
+```C#
+     static int Main(string[] args)
+    {
+            var parser = Parser<ProgramArgs>.Create();
+            try
+            {
+                parsed = parser.Parse(args);
+            }
+            catch (ParserException ex)
+            {
+                Console.WriteLine($"ERROR: {ex.UserErrorMessage}");
+
+                Console.WriteLine("----------------------------------------");
+
+                var lines = Parser<SampleArgs>.GetHelpMessage("sampleapp").Split("\n");
+                foreach (var line in lines)
+                {
+                    Console.WriteLine(line);
+                }
+
+                return -1;
+            }
+
+            Console.WriteLine($"Parsed '{args}' successfully");
+            
+            return 0;
+        }
+```
+
 # Advanced Topics
 
 ## A1. Using base 2, 8 and 16 in command line arguments
@@ -778,42 +815,5 @@ Clux can provide you with the remainder when parsing fails, if you specifically 
         {
             var result = Parser<Docker>.Parse(out remainder, new string[] { "verb" } );
             Assert.Equal("verb", result.Verb);
-        }
-```
-
-## Error Handling
-
-When a parser error occurs, the Clux library will throw a ParserException-derived exception.
-
-The most appropriate response for the host application would be to output the exception's error message, followed by the usage help message.
-
-#### Example:
-
-```C#
-     static int Main(string[] args)
-    {
-            var parser = Parser<ProgramArgs>.Create();
-            try
-            {
-                parsed = parser.Parse(args);
-            }
-            catch (ParserException ex)
-            {
-                Console.WriteLine($"ERROR: {ex.UserErrorMessage}");
-
-                Console.WriteLine("----------------------------------------");
-
-                var lines = Parser<SampleArgs>.GetHelpMessage("sampleapp").Split("\n");
-                foreach (var line in lines)
-                {
-                    Console.WriteLine(line);
-                }
-
-                return -1;
-            }
-
-            Console.WriteLine($"Parsed '{args}' successfully");
-            
-            return 0;
         }
 ```
