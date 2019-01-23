@@ -135,7 +135,7 @@ public class Args
 
 ```
 
-Named options may optionally be specified on the command-line using the equals operator.
+Named options may optionally be specified on the command-line using the assignment operator.
 
 #### Example
 ```C#
@@ -445,6 +445,8 @@ When a parser error occurs, the Clux library will throw a ParserException-derive
 
 The most appropriate response for the host application would be to output the exception's error message, followed by the usage help message.
 
+ParserException contains fields specifying the input, the next unparsed positional argument index, and the remaining arguments that were not parsed.
+
 #### Example:
 
 ```C#
@@ -640,7 +642,7 @@ Likewise, Clux will correctly determine the order for any argument that is decor
 
 If your classes contain non-decorated members, then you should keep in mind that the CLR will layout instances of the class in memory in whatever it considers to be the optimal order.  In other words, in an undefined order, as far as C# code is concerned.  Clux will order arguments deterministically in this case, but not neccessarily in declaration order.
 
-Clux will sort all unattributed arguments before all attributed orders, so if you have a **[Positional]** argument, no unattribute argument may appear following it on the command line.  This may not be what you want, but is a decent default.
+Clux will sort all unattributed named arguments before all attributed orders, so if you have a **[Positional]** argument, no unattribute named argument may appear following it on the command line.  This may not be what you want, but is a decent default.
 
 To change this behaviour without decorating individual members, you could require the CLR to layout instances of a class in memory in declaration order, by decorating the class itself with **[StructLayout(LayoutKind.Sequential)]**...
 
@@ -678,7 +680,9 @@ public class SArgs
     [Usage("The world")]
     public string World;
 }
-// usage: program <hello> [-w <world>] 
+// usage: program <hello> [-w <world>]
+//        <hello>: The greeting
+//    -w, --world: The world 
 
 ```
 
@@ -793,27 +797,63 @@ This is an experimental feature, which may be replaced with a different/better i
 
 ## A9. Remainders
 
-Clux can provide you with the remainder when parsing fails, if you specifically request it.
+In addition to providing remainders when parsing fails, leading to a ParserException, it is possible to ask Clux to 
+Clux can provide you with the remainder instead of throwing a parser exception.
 
 ```C#
 
-        public class Foo
-        {
-            [Positional]
-            [Required]
-            [Usage("The command to perform, e.g. run, exec, kill, stop, ...")]
-            public string Verb { get; set; }
-        }
+    class Docker
+    {
+        [Positional]
+        [Required]
+        public string Verb { get; set; }
+    }
 
-        string[] remainder;
-        try
+    class DockerRun
+    {
+        public bool? Interactive;
+    }
+
+    public void Foo()
+    {
+        var parsed = Parser<Docker>.Parse(out var remainder, new [] {
+            "run", "-i"
+        });
+
+        if (parsed.Verb == "run")
         {
-            Parser<Docker>.Parse(out remainder, new string[0] );
-            Assert.False(true);
+            var runCommand = Parser<DockerRun>.Parse(remainder);
+
+            Console.WriteLine($"run: interactive={runCommand.Interactive}");
         }
-        catch (MissingRequiredOption<Docker>)
+        else
         {
-            var result = Parser<Docker>.Parse(out remainder, new string[] { "verb" } );
-            Assert.Equal("verb", result.Verb);
+            Console.WriteLine($"Unknown verb: {parsed.Verb}");
         }
+    }
+```
+
+## A10. Error Handling + Merged Options
+
+Merged short options may have been separated by the time a ParserException is raised, so it is possible that the exception's Remainder field will differ from the actual input.
+
+#### Example
+
+```C#
+    try
+    {
+        Parser<Foo>.Parse(new []{"-abcd", "-efgh"});
+    }
+    catch (ParserException ex)
+    {
+        Output(ex.Input);
+        // will be precisely:
+        //   -abcd -efgh
+
+        Output(ex.Remainder);
+        // could for example be any of the following:
+        //   -a -b -c -d -efgh
+        //   -abcd -efgh
+        //   -abcd -e -f -g -h
+    }
 ```

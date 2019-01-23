@@ -47,6 +47,7 @@ namespace TestClux.Miscellaneous
             try
             {
                 Parser<RemainderError>.Parse(out remainder, new string[] { "verb", "remainder", "jar" } );
+                Assert.True(false);
             }
             catch (Exception)
             {
