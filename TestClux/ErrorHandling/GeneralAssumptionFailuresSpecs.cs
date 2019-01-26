@@ -30,7 +30,7 @@ namespace TestClux.ErrorHandling
             }
             catch (AssumptionFailure  ex)
             {
-                Assert.Equal("Expected explicitly optional and explicitly required (True) to be false", ex.Message);
+                Assert.Equal("Expected explicitly optional and explicitly required (True) to be False", ex.Message);
             }
         }
      }

@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>Clux</PackageId>
-    <PackageVersion>1.0.0.11</PackageVersion>
+    <PackageVersion>1.1.0.1</PackageVersion>
     <Authors>David Brandt</Authors>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageLicenseType>Unlicense</PackageLicenseType>
@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/padresmurfa/clux.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/padresmurfa/clux</PackageProjectUrl>
-    <PackageReleaseNotes>This version improves error exceptions, adding 'user error message' to all parser exceptions.</PackageReleaseNotes>
+    <PackageReleaseNotes>This version adds an updated Assumptions package, with some bugfixes.</PackageReleaseNotes>
     <Summary>A rich, yet developer friendly, C# command line user experience</Summary>
     <PackageTags>Command, Commandline, Command Line, Command Line Arguments, Parsing, Args, Arguments</PackageTags>
     <Title>Command-Line User Experience</Title>
@@ -26,8 +26,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" />
-    <PackageReference Include="Assumptions" Version="1.1.0" />
+    <PackageReference Include="NuGet.Build.Packaging" Version="0.2.2" />
+    <PackageReference Include="Assumptions" Version="1.1.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Attributes\" />
