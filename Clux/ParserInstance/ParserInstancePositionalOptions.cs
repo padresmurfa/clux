@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System;
 using System.Collections;
+using Assumptions;
 
 namespace Clux
 {
@@ -36,13 +37,16 @@ namespace Clux
                 throw new ArgumentException($"Internal Error: position({position}) > byPosition.Count", nameof(position));
             }
 
+            //Assume.
+            //    That(position, "requested positional number").
+            //    Is.Less.Than(this.ByPosition.Count(), "total number of positional options");
+
             var po = this.ByPosition[position];
             
-            if (po.Passed)
-            {
-                throw new ArgumentException($"Internal Error: passed position({position}) already", nameof(position));
-            }
-            
+            Assume.
+                That(po.Passed, "requested positional already passed").
+                Is.False();
+
             return po;
         }
     }

@@ -27,6 +27,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" />
+    <PackageReference Include="Assumptions" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Attributes\" />

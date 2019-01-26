@@ -4,6 +4,7 @@ using System.Reflection;
 using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
+using Assumptions;
 
 namespace Clux
 {
@@ -254,7 +255,8 @@ namespace Clux
                 }
                 else
                 {
-                    throw new NotSupportedException("type " + targetType.FullName + " used by " + this.property.Name + " has an unsupported base type");
+                    Assume.Unreachable("type " + targetType.FullName + " used by " + this.property.Name + " has an unsupported base type");
+                    return null;
                 }
             }
         }
@@ -280,9 +282,10 @@ namespace Clux
             {
                 throw new InvalidOptionValue<T>(property, arg);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-               throw new InvalidOptionValue<T>(property, arg);
+                Assume.Unreachable("Unexpected exception", ex);
+                throw new InvalidOptionValue<T>(property, arg);
             }
         }
     }

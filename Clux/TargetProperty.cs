@@ -4,6 +4,7 @@ using System.Reflection;
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
+using Assumptions;
 
 namespace Clux
 {
@@ -142,7 +143,8 @@ namespace Clux
                     }
                 }
                 
-                throw new NotSupportedException();
+                Assume.Unreachable("Only 8, 16, 32 and 64 bit signed and unsigned integers are supported");
+                return -1;
             }
         }
         
@@ -290,14 +292,13 @@ namespace Clux
 
         TargetProperty(string name, Attributes attributes, System.Type memberType, System.Type declaringType)
         {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (memberType == null)
-            {
-                throw new ArgumentNullException(nameof(memberType));
-            }
+            Assume.
+                That(name, nameof(name)).
+                Is.NotNull();
+                
+            Assume.
+                That(memberType, nameof(memberType)).
+                Is.NotNull();
             
             this.Ignore = (attributes.Ignore != null) || (!attributes.IsTargettable);
             
@@ -328,10 +329,9 @@ namespace Clux
             var isExplicitlyOptional = attributes.Optional != null;
             var isExplicitlyRequired = attributes.Required != null;
             
-            if (isExplicitlyOptional && isExplicitlyRequired)
-            {
-                throw new InvalidOptionDeclaration<T>(this);
-            }
+            Assume.
+                That(isExplicitlyOptional && isExplicitlyRequired, "explicitly optional and explicitly required").
+                Is.False();
             
             if (isExplicitlyRequired)
             {
@@ -461,15 +461,13 @@ namespace Clux
             else
             {
                 var fi = typeof(T).GetField(Name);
-                if (fi != null)
-                {
-                    fi.SetValue(instance, value);
-                    Touched = true;
-                }
-                else
-                {
-                    throw new NotImplementedException("The target is neither a property or a field.  This was unexpected.");
-                }
+                
+                Assume.
+                    That(fi, Name).
+                    Is.NotNull();
+                    
+                fi.SetValue(instance, value);
+                Touched = true;
             }
         }
 
@@ -483,14 +481,12 @@ namespace Clux
             else
             {
                 var fi = typeof(T).GetField(Name);
-                if (fi != null)
-                {
-                    return fi.GetValue(instance);
-                }
-                else
-                {
-                    throw new NotImplementedException("The target is neither a property or a field.  This was unexpected.");
-                }
+
+                Assume.
+                    That(fi, Name).
+                    Is.NotNull();
+
+                return fi.GetValue(instance);
             }
         }
 

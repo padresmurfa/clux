@@ -6,10 +6,11 @@ using Clux;
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Assumptions;
 
 namespace TestClux.ErrorHandling
 {
-    public class InvalidOptionDeclarationSpecs
+    public class GeneralAssumptionFailuresSpecs
     {
         class OptionalOverrideAndRequired
         {
@@ -27,11 +28,9 @@ namespace TestClux.ErrorHandling
                 Parser<OptionalOverrideAndRequired>.Parse(new []{ "--conflicting", "1" });
                 Assert.False(true);
             }
-            catch (InvalidOptionDeclaration<OptionalOverrideAndRequired> ex)
+            catch (AssumptionFailure  ex)
             {
-                Assert.Equal("conflicting", ex.Option.Name);
-                
-                Assert.Equal("Conflicting option declaration. 'conflicting' was explicitly declared to be both Optional and Required", ex.UserErrorMessage);
+                Assert.Equal("Expected explicitly optional and explicitly required (True) to be false", ex.Message);
             }
         }
      }
