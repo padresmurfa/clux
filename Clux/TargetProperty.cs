@@ -294,11 +294,11 @@ namespace Clux
         {
             Assume.
                 That(name, nameof(name)).
-                Is.NotNull();
+                Is.Not.Null();
                 
             Assume.
                 That(memberType, nameof(memberType)).
-                Is.NotNull();
+                Is.Not.Null();
             
             this.Ignore = (attributes.Ignore != null) || (!attributes.IsTargettable);
             
@@ -464,7 +464,7 @@ namespace Clux
                 
                 Assume.
                     That(fi, Name).
-                    Is.NotNull();
+                    Is.Not.Null();
                     
                 fi.SetValue(instance, value);
                 Touched = true;
@@ -484,7 +484,7 @@ namespace Clux
 
                 Assume.
                     That(fi, Name).
-                    Is.NotNull();
+                    Is.Not.Null();
 
                 return fi.GetValue(instance);
             }
