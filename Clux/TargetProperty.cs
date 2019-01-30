@@ -293,11 +293,11 @@ namespace Clux
         TargetProperty(string name, Attributes attributes, System.Type memberType, System.Type declaringType)
         {
             Assume.
-                That(name, nameof(name)).
+                That(name).
                 Is.Not.Null();
                 
             Assume.
-                That(memberType, nameof(memberType)).
+                That(memberType).
                 Is.Not.Null();
             
             this.Ignore = (attributes.Ignore != null) || (!attributes.IsTargettable);
@@ -330,8 +330,8 @@ namespace Clux
             var isExplicitlyRequired = attributes.Required != null;
             
             Assume.
-                That(isExplicitlyOptional && isExplicitlyRequired, "explicitly optional and explicitly required").
-                Is.False();
+                That(isExplicitlyOptional && isExplicitlyRequired).
+                Is.False("Cannot explicitly state that an attribute is both optional and required");
             
             if (isExplicitlyRequired)
             {
@@ -463,7 +463,7 @@ namespace Clux
                 var fi = typeof(T).GetField(Name);
                 
                 Assume.
-                    That(fi, Name).
+                    That(fi).
                     Is.Not.Null();
                     
                 fi.SetValue(instance, value);
@@ -483,7 +483,7 @@ namespace Clux
                 var fi = typeof(T).GetField(Name);
 
                 Assume.
-                    That(fi, Name).
+                    That(fi).
                     Is.Not.Null();
 
                 return fi.GetValue(instance);

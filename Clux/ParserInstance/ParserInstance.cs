@@ -4,6 +4,7 @@ using System.Reflection;
 using System;
 using System.Collections;
 using System.Runtime.CompilerServices;
+using Assumptions;
 
 namespace Clux
 {
@@ -15,52 +16,84 @@ namespace Clux
         
         public ParserInstance()
         {
-            if (IsParserUnion)
+            try
             {
-                this.All = new List<TargetProperty<T>>();
+                if (IsParserUnion)
+                {
+                    this.All = new List<TargetProperty<T>>();
+                }
+                else
+                {
+                    this.All = TargetProperty<T>.TargetPropertiesAndFields.ToList();
+                }
+                
+                this.ByPosition = new ParserInstancePositionalOptions<T>(this.All);
+                this.ByShortOption = new ParserInstanceShortOptions<T>(this.All);
+                this.ByLongOption = new ParserInstanceLongOptions<T>(this.All);
             }
-            else
+            catch (System.Exception ex)
             {
-                this.All = TargetProperty<T>.TargetPropertiesAndFields.ToList();
+                Assume.That(ex).Is.InstanceOf(new []{ typeof(ParserException), typeof(AssumptionFailure) });
+                throw;
             }
-            
-            this.ByPosition = new ParserInstancePositionalOptions<T>(this.All);
-            this.ByShortOption = new ParserInstanceShortOptions<T>(this.All);
-            this.ByLongOption = new ParserInstanceLongOptions<T>(this.All);
         }
 
         public T Parse(params string[] args)
         {
-            string[] remainder;
-            
-            if (IsParserUnion)
+            try
             {
-                return ParseUnion(out remainder, args);
+                string[] remainder;
+                
+                if (IsParserUnion)
+                {
+                    return ParseUnion(out remainder, args);
+                }
+                
+                return Parse(false, out remainder, args);
             }
-            
-            return Parse(false, out remainder, args);
+            catch (System.Exception ex)
+            {
+                Assume.That(ex).Is.InstanceOf(new []{ typeof(ParserException), typeof(AssumptionFailure) });
+                throw;
+            }
         }
         
         public T Parse(out string[] remainder, params string[] args)
         {
-            if (IsParserUnion)
+            try
             {
-                return ParseUnion(out remainder, args);
+                if (IsParserUnion)
+                {
+                    return ParseUnion(out remainder, args);
+                }
+                
+                return Parse(true, out remainder, args);
             }
-            
-            return Parse(true, out remainder, args);
+            catch (System.Exception ex)
+            {
+                Assume.That(ex).Is.InstanceOf(new []{ typeof(ParserException), typeof(AssumptionFailure) });
+                throw;
+            }
         }
 
         public string GetHelpMessage(string command)
         {
-            return ParserHelp<T>.GetHelpMessage(command, this.All, this.ByPosition, this.ByShortOption, this.ByLongOption);
+            try
+            {
+                return ParserHelp<T>.GetHelpMessage(command, this.All, this.ByPosition, this.ByShortOption, this.ByLongOption);
+            }
+            catch (System.Exception ex)
+            {
+                Assume.That(ex).Is.InstanceOf(new []{ typeof(ParserException), typeof(AssumptionFailure) });
+                throw;
+            }
         }
     }
     
     // parser union specific code:
     public partial class ParserInstance<T>
     {
-       void IParserUnionParserInstance.Parse(IParserUnion union, params string[] args)
+        void IParserUnionParserInstance.Parse(IParserUnion union, params string[] args)
         {
             var result = Parse(args);
             union.SetResult(result);

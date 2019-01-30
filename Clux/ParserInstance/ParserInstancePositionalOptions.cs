@@ -44,8 +44,8 @@ namespace Clux
             var po = this.ByPosition[position];
             
             Assume.
-                That(po.Passed, "requested positional already passed").
-                Is.False();
+                That(po.Passed).
+                Is.False("requested positional already passed");
 
             return po;
         }
