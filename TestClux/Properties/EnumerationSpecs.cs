@@ -71,5 +71,27 @@ namespace TestClux.Properties
 
             Assert.True( lines.Any(line => line.Contains("-a,") && line.Contains("(stdin|stdout|stderr)")) );
         }
+        
+        enum KEnumTypeWithoutValues : int
+        {
+            red,
+            green,
+            blue
+        }
+        
+        class CloptsWithoutValues
+        {
+            public KEnumTypeWithoutValues KEnum;
+        }
+        
+        [Fact]
+        public void DoesAcceptEnumOptionByNameWhenValueNotExplicitlyRequested()
+        {
+            Clux.ParserInstance<CloptsWithoutValues> parser = Parser<CloptsWithoutValues>.Create();
+
+            var clopts = parser.Parse(new[] { "--k-enum", "green" });
+            
+            Assert.Equal(KEnumTypeWithoutValues.green, clopts.KEnum);
+        }
      }
 }

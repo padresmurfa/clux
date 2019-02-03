@@ -54,15 +54,10 @@ namespace Clux
             var underlyingValue = new ParserArg<T>(property, underlyingType, arg).ParseArg();
 
             var valueType = underlyingValue.GetType();
-
-            var retval = Enum.ToObject(targetType, (dynamic)underlyingValue);
             
-            foreach (var e in enumValues)
+            if (Enum.IsDefined(targetType, underlyingValue))
             {
-                if (e.Equals(retval))
-                {
-                    return e;
-                }
+                return Enum.ToObject(targetType, (dynamic)underlyingValue);
             }
             
             throw new InvalidOptionValue<T>(property, arg);
